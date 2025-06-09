@@ -1,4 +1,4 @@
-package com.filiera.model;
+package com.filiera.model.administration;
 
 import com.filiera.model.users.RuoloUser;
 import com.filiera.model.users.User;

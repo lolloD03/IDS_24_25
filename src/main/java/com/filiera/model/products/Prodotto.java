@@ -1,6 +1,6 @@
 package com.filiera.model.products;
 
-import com.filiera.model.Curatore;
+import com.filiera.model.administration.Curatore;
 import com.filiera.model.sellers.Venditore;
 
 import java.time.LocalDate;

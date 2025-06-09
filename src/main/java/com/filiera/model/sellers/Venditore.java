@@ -1,7 +1,7 @@
 package com.filiera.model.sellers;
 
-import com.filiera.model.products.users.RuoloUser;
-import com.filiera.model.products.users.User;
+import com.filiera.model.users.RuoloUser;
+import com.filiera.model.users.User;
 import com.filiera.model.products.Prodotto;
 
 import java.util.ArrayList;

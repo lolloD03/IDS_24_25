@@ -1,6 +1,6 @@
 package com.filiera.repository;
 
-import com.filiera.model.products.users.User;
+import com.filiera.model.users.User;
 
 import java.util.*;
 

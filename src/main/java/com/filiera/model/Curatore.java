@@ -1,7 +1,7 @@
 package com.filiera.model;
 
-import com.filiera.model.products.users.RuoloUser;
-import com.filiera.model.products.users.User;
+import com.filiera.model.users.RuoloUser;
+import com.filiera.model.users.User;
 
 public class Curatore extends User {
 

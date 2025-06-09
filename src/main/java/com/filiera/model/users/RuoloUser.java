@@ -1,4 +1,4 @@
-package com.filiera.model.products.users;
+package com.filiera.model.users;
 
 public enum RuoloUser {
 

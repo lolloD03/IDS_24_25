@@ -5,8 +5,6 @@ import com.filiera.controller.CuratoreController;
 import com.filiera.model.administration.Curatore;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
-import com.filiera.repository.InMemoryProductRepository;
-import com.filiera.repository.InMemoryUserRepository;
 import com.filiera.services.CuratoreServiceImpl;
 import org.junit.jupiter.api.*;
 

@@ -3,7 +3,6 @@ package com.filiera.services;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.sellers.Venditore;
 import com.filiera.model.users.User;
-import com.filiera.repository.CrudRepository;
 
 import com.filiera.model.products.StatoProdotto;
 

@@ -3,8 +3,6 @@ package com.filiera.services;
 import com.filiera.model.administration.Curatore;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
-import com.filiera.repository.InMemoryProductRepository;
-import com.filiera.repository.InMemoryUserRepository;
 
 import java.util.List;
 import java.util.UUID;

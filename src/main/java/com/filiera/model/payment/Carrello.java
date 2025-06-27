@@ -1,76 +1,104 @@
+
 package com.filiera.model.payment;
 
+import com.filiera.exception.EmptyCartException;
+import com.filiera.exception.ProductNotFoundException;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.users.Acquirente;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@NoArgsConstructor
+@Getter
+@Setter
+@Entity
 public class Carrello {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private List<Prodotto> products;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemCarrello> products = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY) // Eager potrebbe caricare troppi dati inutilmente
+    @JoinColumn(name = "buyer_id", referencedColumnName = "id") // Nome della colonna FK e della PK di Acquirente
     private Acquirente buyer;
 
-    private double totalPrice;
+    //private double totalPrice;
 
-    public Carrello() {
-        this.id = UUID.randomUUID();
-        this.products = new ArrayList<>();
-        this.buyer = new Acquirente();
-    }
 
-    public Carrello(List<Prodotto> products , Acquirente buyer) {
-        this.id = UUID.randomUUID();
+    public Carrello(List<ItemCarrello> products , Acquirente buyer) {
         this.products = products;
         this.buyer = buyer;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public List<Prodotto> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Prodotto> products) {
-        this.products = products;
-    }
-
-    public Acquirente getBuyer() {
-        return buyer;
-    }
-
-    public void setBuyer(Acquirente buyer) {
-        this.buyer = buyer;
-    }
 
     public double getTotalPrice() {
 
-        return products.stream()
-                .mapToDouble(Prodotto::getPrice)
-                .sum();
+        if(products.isEmpty()) {
+            throw new EmptyCartException("Cart Is Empty");
+        }
+
+        return products.stream().mapToDouble(ItemCarrello::getTotal).sum();
 
     }
 
-    public Prodotto addProduct(Prodotto product) {
-        if(product==null){throw new RuntimeException("Il prodotto è nullo");}
-        products.add(product);
-        return product;
+    public void addProduct(Prodotto product, int quantity) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product can't be null");
+        }
+
+        // Prova a trovare un ItemCarrello esistente per il prodotto
+        products.stream()
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .findFirst() // Trova il primo (e unico) match
+                .ifPresentOrElse( // Se è presente, aggiorna la quantità
+                        item -> item.increaseQuantity(quantity),
+                        // Altrimenti, crea un nuovo ItemCarrello e aggiungilo
+                        () -> {
+                            ItemCarrello newItem = new ItemCarrello(product, quantity);
+                            newItem.setCart(this); // Collega il nuovo item a questo carrello
+                            products.add(newItem);
+                        }
+                );
     }
 
-    public Prodotto removeProduct(Prodotto product) {
-        if(!products.contains(product)){throw new RuntimeException("Il prodotto non è nel carrello");}
-        products.remove(product);
-        return product;
+    public void removeProduct(Prodotto product, int quantity) {
+        if (product == null) {
+            throw new IllegalArgumentException("Product can't be null");
+        }
+
+        // Trova l'ItemCarrello da modificare/rimuovere
+        products.stream()
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .findFirst()
+                .ifPresentOrElse(
+                        item -> {
+                            item.decreaseQuantity(quantity);
+                            if (item.getQuantity() <= 0) {
+                                // Rimuovi l'elemento dalla lista se la quantità scende a zero o meno
+                                products.remove(item);
+                                // Nota: Se ItemCarrello ha orphanRemoval=true, questo lo eliminerà dal DB.
+                            }
+                        },
+                        // Se il prodotto non è nel carrello, potresti lanciare un'eccezione
+                        // o semplicemente non fare nulla (dipende dalla logica di business desiderata)
+                        () -> {
+                            throw new ProductNotFoundException("Product " + product.getName() + " is not in the cart");
+                        }
+                );
     }
 
     public void clearCarrello() {
         products.clear();
     }
+
 
 }

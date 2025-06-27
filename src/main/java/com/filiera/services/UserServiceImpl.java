@@ -2,8 +2,6 @@ package com.filiera.services;
 
 
 import com.filiera.model.users.User;
-import com.filiera.repository.CrudRepository;
-import com.filiera.repository.InMemoryUserRepository;
 
 import java.util.UUID;
 

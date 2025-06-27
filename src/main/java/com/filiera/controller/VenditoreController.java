@@ -2,8 +2,7 @@ package com.filiera.controller;
 
 import com.filiera.model.dto.ProdottoRequestDTO;
 import com.filiera.model.dto.ProductResponseDTO;
-import com.filiera.model.products.Prodotto;
-import com.filiera.model.sellers.Venditore;
+
 import com.filiera.services.ProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

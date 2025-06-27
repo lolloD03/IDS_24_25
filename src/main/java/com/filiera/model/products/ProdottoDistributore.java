@@ -1,34 +1,43 @@
 package com.filiera.model.products;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProdottoDistributore {
+@Entity
+@DiscriminatorValue("PRODOTTODISTRIBUTORE")
+public class ProdottoDistributore extends Prodotto{
 
-    private List<Prodotto> prodotti;
+    @OneToMany
+    private List<Prodotto> products;
 
     public ProdottoDistributore() {
-        this.prodotti = new ArrayList<>();
+        this.products = new ArrayList<>();
     }
 
-    public ProdottoDistributore(List<Prodotto> prodotti) {
-        this.prodotti = prodotti;
+    public ProdottoDistributore(List<Prodotto> products) {
+        this.products = products;
     }
 
-    public void addToProdotti(Prodotto prodotto) {
-        prodotti.add(prodotto);
+    public void addToProducts(Prodotto product) {
+        products.add(product);
     }
 
-    public void removeFromProdotti(Prodotto prodotto) {
-        prodotti.remove(prodotto);
+    public void removeFromProducts(Prodotto product) {
+        products.remove(product);
     }
 
-    public List<Prodotto> getProdotti() {
-        return prodotti;
+    public List<Prodotto> getProducts() {
+        return products;
     }
 
-    public void setProdotti(List<Prodotto> prodotti) {
-        this.prodotti = prodotti;
+    public void setProducts(List<Prodotto> products) {
+        this.products = products;
     }
 
 }
+
+

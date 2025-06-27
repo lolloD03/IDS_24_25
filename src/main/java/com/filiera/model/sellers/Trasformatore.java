@@ -24,17 +24,7 @@ public class Trasformatore extends Venditore {
     @Column(nullable = false) // Assicuriamo che il processo di produzione non sia null
     private String process;
 
-    // Con @SuperBuilder, @NoArgsConstructor e @Getter/@Setter,
-    // i costruttori e i metodi getter/setter manuali non sono più necessari.
-    // Il campo 'process' è ora gestito dalle annotazioni Lombok.
-    // L'ID e la PartitaIVA sono gestiti dalle classi User e Venditore.
 
-    // Il costruttore manuale precedente:
-    // public Trasformatore(String password, String email, String name, RuoloUser ruoloUser, int partitaIva) {
-    //     super(password, email, name, ruoloUser, partitaIva);
-    //     this.process = process; // Attenzione: qui 'process' non era inizializzato correttamente!
-    // }
-    // Non è più necessario grazie a @SuperBuilder.
 }
 
 

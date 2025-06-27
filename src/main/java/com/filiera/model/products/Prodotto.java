@@ -24,8 +24,8 @@ import java.util.UUID;
 public class Prodotto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) // <--- Cambiato da UUID a Long, generazione automatica
-    private UUID id; // <--- Tipo Long
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Enumerated(EnumType.STRING) // Mappa l'enum come stringa nel DB
     private StatoProdotto state; // Enum StatoProdotto (APPROVATO, ESAURITO, IN_ATTESA_DI_APPROVAZIONE, RIFIUTATO)
@@ -39,8 +39,7 @@ public class Prodotto {
     @JoinColumn(name = "approved_by_id")
     private Curatore approvedBy;
 
-    // LocalDate non richiede @Temporal(TemporalType.DATE) con JPA moderno (Spring Boot 2.x+ / Hibernate 5+),
-    // dato che viene mappato correttamente a DATE per default. Puoi lasciarlo per chiarezza se preferisci.
+
     @FutureOrPresent(message = "Expiration date cannot be in the past")
     private LocalDate expirationDate;
 
@@ -68,10 +67,7 @@ public class Prodotto {
         if (this.state == null) {
             this.state = StatoProdotto.PENDING_APPROVAL;
         }
-        // Se non viene settata una data di scadenza, puoi settarla qui
-        // if (this.expirationDate == null) {
-        //     this.expirationDate = LocalDate.now().plusDays(30); // Esempio: 30 giorni di default
-        // }
+
     }
 
     // --- Metodi con Logica di Business ---

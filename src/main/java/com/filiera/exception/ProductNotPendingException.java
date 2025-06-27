@@ -1,4 +1,4 @@
-package com.filiera.model.exception;
+package com.filiera.exception;
 
 public class ProductNotPendingException extends RuntimeException {
     public ProductNotPendingException(String message) {

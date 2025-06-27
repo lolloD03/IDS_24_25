@@ -1,5 +1,6 @@
-package com.filiera.model.config;
+package com.filiera.config;
 
+import com.filiera.exception.*;
 import com.filiera.model.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

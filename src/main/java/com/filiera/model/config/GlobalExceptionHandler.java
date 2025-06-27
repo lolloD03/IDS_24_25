@@ -75,16 +75,16 @@ import com.filiera.model.dto.ErrorResponse;
         }
 
         // Handle custom InvalidUserTypeException
-        @ExceptionHandler(InvalidUserTypeException.class)
-        public ResponseEntity<ErrorResponse> handleInvalidUserTypeException(InvalidUserTypeException ex) {
-            log.error("Invalid user type: {}", ex.getMessage());
-            ErrorResponse errorResponse = new ErrorResponse(
-                    "INVALID_USER_TYPE",
-                    ex.getMessage(),
-                    HttpStatus.BAD_REQUEST.value()
-            );
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
+    @ExceptionHandler(InvalidUserTypeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidUserTypeException(InvalidUserTypeException ex) {
+        log.error("Invalid user type: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                "INVALID_USER_TYPE",
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
         @ExceptionHandler(UnauthorizedOperationException.class)
         public ResponseEntity<ErrorResponse> handleUnauthorizedOperationException(UnauthorizedOperationException ex) {

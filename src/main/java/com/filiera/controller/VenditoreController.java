@@ -1,61 +1,99 @@
 package com.filiera.controller;
 
+import com.filiera.model.dto.ProdottoRequestDTO;
+import com.filiera.model.dto.ProductResponseDTO;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.sellers.Venditore;
 import com.filiera.services.ProductService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RestController
+@RequestMapping("/venditore")
+@Validated
 public class VenditoreController {
+
     private final ProductService service;
 
-    public VenditoreController(ProductService service) { this.service = service; }
-
-
-    public Prodotto createProduct(Venditore venditore, String name, String descrizione, double price, int quantity) {
-
-        try {
-            if (venditore == null || name == null || descrizione == null || price <= 0 || quantity <= 0) {
-                throw new IllegalArgumentException("Invalid product details provided.");
-            }
-
-            return service.createProduct(venditore, name, descrizione, price, quantity);
-
-        } catch (IllegalArgumentException e) {
-            System.err.println("Error creating product: " + e.getMessage());
-            return null;
-        }
-
+    @Autowired
+    public VenditoreController(ProductService service) {
+        this.service = service;
     }
 
-    public Prodotto updateProduct(Prodotto updatedProduct) {
+    @PostMapping("/create-product")
+    public ResponseEntity<ProductResponseDTO> createProduct(
+            @RequestBody @Valid ProdottoRequestDTO productDTO,
+            @RequestHeader("X-User-Id") UUID sellerId) { // Simulazione header di autenticazione
 
-        try {
-            return service.updateProduct(updatedProduct);
-        } catch (Exception e) {
-            System.err.println("Error updating product: " + e.getMessage());
-            return null;
-        }
-
+        ProductResponseDTO createdProduct = service.createProduct(productDTO, sellerId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
-    public void deleteProduct(Prodotto toDeleteProduct) {
+    // Alternativa: endpoint temporaneo per testing
+    @PostMapping("/create-product-test")
+    public ResponseEntity<ProductResponseDTO> createProductForTesting(
+            @RequestBody @Valid ProdottoRequestDTO productDTO,
+            @RequestParam UUID sellerId) { // Parametro temporaneo per test
 
-        try {
-            service.deleteProduct(toDeleteProduct);
-        } catch (IllegalArgumentException e) {
-            System.err.println("Error updating product: " + e.getMessage());
-        }
+        ProductResponseDTO createdProduct = service.createProduct(productDTO, sellerId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
 
-    public List<Prodotto> getApprovedProducts() {
-        return service.getApprovedProducts();
+    @PutMapping("/update-product")
+    public ResponseEntity<ProductResponseDTO> updateProduct(
+            @PathVariable UUID productId,
+            @RequestBody @Valid ProdottoRequestDTO productDTO ,
+            @RequestHeader("X-User-Id") UUID sellerId) { // Simulazione header di autenticazione
+
+
+        ProductResponseDTO product = service.updateProduct(productId, productDTO , sellerId);
+        return ResponseEntity.ok(product);
     }
 
-    public Optional<Prodotto> getById(UUID id) { return service.getById(id); }
+    @PutMapping("/update-product-testing")
+    public ResponseEntity<ProductResponseDTO> updateProductForTesting(
+            @PathVariable UUID productId,
+            @RequestBody @Valid ProdottoRequestDTO productDTO ,
+            @RequestParam UUID sellerId) { // Simulazione header di autenticazione
 
-    public List<Prodotto> list() { return service.listAll(); }
+
+
+        ProductResponseDTO product = service.updateProduct(productId, productDTO , sellerId);
+        return ResponseEntity.ok(product);
+    }
+
+    @DeleteMapping("/delete-product")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
+        service.deleteProduct(productId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/approved-products")
+    public ResponseEntity<List<ProductResponseDTO>> getApprovedProducts() {
+        List<ProductResponseDTO> products = service.getApprovedProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/product/{id}")
+    public ResponseEntity<ProductResponseDTO> getById(@PathVariable @NotNull UUID id) { // Changed return type
+        Optional<ProductResponseDTO> product = service.getById(id); // Service returns Optional<DTO>
+        return product.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+        List<ProductResponseDTO> products = service.listAll();
+        return ResponseEntity.ok(products);
+    }
 }

@@ -1,6 +1,6 @@
 package com.filiera.model.sellers;
 
-iimport com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.filiera.exception.ProductNotFoundException;
 import com.filiera.model.OsmMap.Indirizzo;

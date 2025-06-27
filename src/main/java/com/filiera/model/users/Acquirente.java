@@ -18,15 +18,5 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true) // Genera un toString che include anche i campi della classe padre
 public class Acquirente extends User {
 
-    // Con @SuperBuilder, @NoArgsConstructor e @Getter/@Setter,
-    // i costruttori e i metodi toString manuali non sono più necessari.
-    // L'ID è ora gestito dalla classe User tramite @GeneratedValue.
 
-    // Il tuo costruttore precedente:
-    // public Acquirente( String password, String email, String name , RuoloUser ruoloUser, String surname) {
-    //     super( password, email, name , ruoloUser); // Qui passavi i campi a super, ma ora la generazione ID è automatica
-    // }
-    // Non è più necessario, useremo il builder.
-
-    // Anche il metodo toString() manuale è stato sostituito da @ToString(callSuper = true)
 }

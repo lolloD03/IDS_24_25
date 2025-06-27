@@ -1,4 +1,4 @@
-package com.filiera.model.exception;
+package com.filiera.exception;
 
 public class CuratorNotFoundException extends RuntimeException {
     public CuratorNotFoundException(String message) {

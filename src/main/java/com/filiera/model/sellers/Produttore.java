@@ -20,12 +20,6 @@ import lombok.experimental.SuperBuilder;
 public class Produttore extends Venditore {
 
     @Column(nullable = false) // Assicuriamo che il processo di coltivazione/produzione non sia null
-    private String process; // Puoi mantenere 'process' come nome generico, o rinominarlo a 'cultivationProcess' per chiarezza
+    private String process;
 
-    // I costruttori manuali sono stati rimossi grazie a @NoArgsConstructor e @SuperBuilder.
-    // I metodi getCultivationProcess() e setCultivationProcess() sono stati sostituiti da @Getter e @Setter.
-    // Se vuoi che i metodi Lombok generati abbiano esattamente quei nomi (getCultivationProcess/setCultivationProcess),
-    // puoi rinominare il campo da 'process' a 'cultivationProcess'.
-    // In alternativa, se lasci 'process', i metodi generati saranno getProcess() e setProcess().
-    // Ho mantenuto 'process' come nel tuo esempio, ma sentiti libero di cambiarlo.
 }

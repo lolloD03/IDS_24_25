@@ -1,4 +1,6 @@
-import com.filiera.model.users.RuoloUser;
+package com.filiera.model.users;
+
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

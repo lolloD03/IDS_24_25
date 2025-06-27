@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class DistributoreTipicita extends Venditore {
-
+/*
     private List<Prodotto> productsBundle;
     private List<List<Prodotto>> listOfBundles;
 
@@ -30,5 +30,7 @@ public class DistributoreTipicita extends Venditore {
 
     public void removeFromListOfBundles(List<Prodotto> bundleOfproducts) {listOfBundles.remove(bundleOfproducts);}
 
+
+ */
 }
 

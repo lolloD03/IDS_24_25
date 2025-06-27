@@ -4,8 +4,6 @@ import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
 import com.filiera.model.sellers.Produttore;
 import com.filiera.model.sellers.Venditore;
-import com.filiera.repository.InMemoryProductRepository;
-import com.filiera.repository.InMemoryUserRepository;
 import com.filiera.services.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

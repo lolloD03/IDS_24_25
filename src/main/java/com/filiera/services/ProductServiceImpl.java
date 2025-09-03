@@ -9,7 +9,6 @@ import com.filiera.model.sellers.Venditore;
 import org.springframework.transaction.annotation.Transactional;
 import com.filiera.model.products.StatoProdotto;
 import com.filiera.repository.InMemoryProductRepository;
-import com.filiera.repository.InMemoryVenditoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;

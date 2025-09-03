@@ -11,7 +11,6 @@ import com.filiera.model.payment.ItemCarrello;
 import com.filiera.model.payment.ItemOrdine;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.users.Acquirente;
-import com.filiera.repository.InMemoryAcquirenteRepository;
 import com.filiera.repository.InMemoryCarrelloRepository;
 import com.filiera.repository.InMemoryOrdineRepository;
 import jakarta.transaction.Transactional;

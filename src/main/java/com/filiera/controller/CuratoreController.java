@@ -1,9 +1,11 @@
 package com.filiera.controller;
 
-
+import com.filiera.model.dto.ProductResponseDTO;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
 import com.filiera.services.CuratoreServiceImpl;
+import com.filiera.services.CurrentUserService;
+import com.filiera.services.ProductService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,32 +21,36 @@ import java.util.UUID;
 public class CuratoreController {
 
     private final CuratoreServiceImpl curatoreService;
+    private final CurrentUserService currentUserService;
+    private final ProductService productService;
 
     @Autowired
-    public CuratoreController(CuratoreServiceImpl curatoreService) {
+    public CuratoreController(CuratoreServiceImpl curatoreService,  CurrentUserService currentUserService,ProductService productService) {
         this.curatoreService = curatoreService;
+        this.currentUserService = currentUserService;
+        this.productService =  productService;
     }
-
-    @GetMapping("/pending-products")
-    public ResponseEntity<List<Prodotto>> getPendingProducts() {
-        List<Prodotto> pendingProducts = curatoreService.getPendingProducts();
-        return ResponseEntity.ok(pendingProducts);
+    @GetMapping("/products")
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+        List<ProductResponseDTO> prodotti = productService.listAll();
+        return ResponseEntity.ok(prodotti);
     }
 
     @PutMapping("/approve-product")
     public ResponseEntity<Prodotto> approveProduct(
-            @RequestParam @NotNull UUID productId,
-            @RequestParam @NotNull UUID curatorId) {
+            @RequestParam @NotNull UUID productId) {
+
+        UUID curatorId = currentUserService.getCurrentUserId();
 
         Prodotto approvedProduct = curatoreService.approveProduct(productId, curatorId);
         return ResponseEntity.ok(approvedProduct);
     }
-
+    // PRENDERE ID DAL CONTESTO DELLA SICUREZZA
     @PutMapping("/reject-product")
     public ResponseEntity<Prodotto> rejectProduct(
-            @RequestParam @NotNull UUID productId,
-            @RequestParam @NotNull UUID curatorId) {
-
+            @RequestParam @NotNull UUID productId
+    ) {
+        UUID curatorId = currentUserService.getCurrentUserId();
         Prodotto rejectedProduct = curatoreService.rejectProduct(productId, curatorId);
         return ResponseEntity.ok(rejectedProduct);
     }
@@ -57,15 +63,13 @@ public class CuratoreController {
         return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/approved-products")
-    public ResponseEntity<List<Prodotto>> getApprovedProducts() {
-        List<Prodotto> approvedProducts = curatoreService.getApprovedProducts();
-        return ResponseEntity.ok(approvedProducts);
+    @GetMapping("/products/pending-approval")
+    public ResponseEntity<List<Prodotto>> getProductsPendingApproval(
+            @RequestParam @NotNull StatoProdotto state) {
+
+        List<Prodotto> products = curatoreService.getProductsByState(StatoProdotto.PENDING_APPROVAL);
+        return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/rejected-products")
-    public ResponseEntity<List<Prodotto>> getRejectedProducts() {
-        List<Prodotto> rejectedProducts = curatoreService.getRejectedProducts();
-        return ResponseEntity.ok(rejectedProducts);
-    }
+    //rimossi getApprovedProduct ecc perche sostituiti da getProductsByState
 }

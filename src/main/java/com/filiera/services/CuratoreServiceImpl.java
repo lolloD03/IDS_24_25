@@ -1,6 +1,5 @@
 package com.filiera.services;
 
-
 import com.filiera.exception.CuratorNotFoundException;
 import com.filiera.exception.InvalidUserTypeException;
 import com.filiera.exception.ProductNotFoundException;

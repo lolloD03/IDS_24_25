@@ -4,6 +4,7 @@ import com.filiera.model.OsmMap.Indirizzo;
 import com.filiera.model.administration.Curatore;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
+import com.filiera.model.sellers.DistributoreTipicita;
 import com.filiera.model.sellers.Produttore;
 import com.filiera.model.sellers.Venditore;
 import com.filiera.model.users.Acquirente;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 
@@ -26,8 +28,6 @@ public class FilieraApplication implements CommandLineRunner {
 
     }
 
-    @Autowired
-    InMemoryAcquirenteRepository acquirenteRepository;
 
     @Autowired
     InMemoryOrdineRepository ordineRepository;
@@ -35,8 +35,7 @@ public class FilieraApplication implements CommandLineRunner {
     @Autowired
     InMemoryProductRepository prodottiRepository;
 
-    @Autowired
-    InMemoryVenditoreRepository venditoreRepository;
+
 
     @Autowired
     InMemoryUserRepository userRepository;
@@ -44,8 +43,9 @@ public class FilieraApplication implements CommandLineRunner {
     @Autowired
     InMemoryCarrelloRepository carrelloRepository;
 
+
     @Autowired
-    InMemoryCuratoreRepository curatoreRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
@@ -63,7 +63,7 @@ public class FilieraApplication implements CommandLineRunner {
                 .process("boh")
                 .partitaIva("tuobabbo")
                 .email("venditore1@gmail.com")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .role(RuoloUser.PRODUTTORE)
                 .build();
 
@@ -73,8 +73,18 @@ public class FilieraApplication implements CommandLineRunner {
                 .process("boh2")
                 .partitaIva("tuobabbo2")
                 .email("venditore2@gmail.com")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .role(RuoloUser.PRODUTTORE)
+                .build();
+
+        Venditore distributoreTipicita = DistributoreTipicita.builder()
+
+                .name("Distributore di tipicità")
+                .address(indirizzo1)
+                .role(RuoloUser.DISTRIBUTORE)
+                .email("distributore@gmail.com")
+                .password(passwordEncoder.encode("password"))
+                .partitaIva("tuobabbo32312")
                 .build();
 
         userRepository.save(venditore1);
@@ -120,6 +130,8 @@ public class FilieraApplication implements CommandLineRunner {
         prodottiRepository.save(patata);
         prodottiRepository.save(passataDiPomodoro);
 
+
+
         venditore1.addProduct(pomodoro);
         venditore1.addProduct(patata);
         venditore2.addProduct(passataDiPomodoro);
@@ -129,21 +141,23 @@ public class FilieraApplication implements CommandLineRunner {
                 .name("Curatore")
                 .role(RuoloUser.CURATORE)
                 .email("curatore@gmail.com")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .build();
 
         Acquirente buyer1 = Acquirente.builder()
                 .name("Acquirente1")
+                .indirizzo(indirizzo1)
                 .role(RuoloUser.ACQUIRENTE)
                 .email("acquirente1@gmail.com")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .build();
 
         Acquirente buyer2 = Acquirente.builder()
                 .name("Acquirente2")
+                .indirizzo(indirizzo2)
                 .role(RuoloUser.ACQUIRENTE)
                 .email("acquirente2@gmail.com")
-                .password("password")
+                .password(passwordEncoder.encode("password"))
                 .build();
 
 
@@ -152,8 +166,10 @@ public class FilieraApplication implements CommandLineRunner {
         System.out.println(venditore1.getId());
 
         userRepository.save(curatore);
+
         userRepository.save(buyer1);
         userRepository.save(buyer2);
+        userRepository.save(distributoreTipicita);
 
 
     }

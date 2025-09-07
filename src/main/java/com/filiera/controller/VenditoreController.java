@@ -1,8 +1,13 @@
 package com.filiera.controller;
 
+import com.filiera.model.dto.PacchettoRequestDTO;
+import com.filiera.model.dto.PacchettoResponseDTO;
 import com.filiera.model.dto.ProdottoRequestDTO;
 import com.filiera.model.dto.ProductResponseDTO;
-
+import com.filiera.model.products.Prodotto;
+import com.filiera.model.sellers.Venditore;
+import com.filiera.services.CurrentUserService;
+import com.filiera.services.PacchettoService;
 import com.filiera.services.ProductService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,16 +27,34 @@ import java.util.UUID;
 public class VenditoreController {
 
     private final ProductService service;
+    private final PacchettoService pacchettoService;
+    private final CurrentUserService currentUserService;
 
     @Autowired
-    public VenditoreController(ProductService service) {
+    public VenditoreController(ProductService service,  PacchettoService pacchettoService, CurrentUserService currentUserService) {
         this.service = service;
+        this.pacchettoService = pacchettoService;
+        this.currentUserService = currentUserService;
+    }
+
+
+    @PostMapping("/create-bundle")
+    public ResponseEntity<PacchettoResponseDTO> createPacchetto(@Valid @RequestBody PacchettoRequestDTO request) {
+        // Ottieni l'ID del venditore autenticato dal contesto di sicurezza
+
+        UUID sellerId = currentUserService.getCurrentUserId();
+
+        // Chiama il service per la logica di business
+        PacchettoResponseDTO createdPacchetto = pacchettoService.createPacchetto(request, sellerId);
+
+        return new ResponseEntity<>(createdPacchetto, HttpStatus.CREATED);
     }
 
     @PostMapping("/create-product")
     public ResponseEntity<ProductResponseDTO> createProduct(
-            @RequestBody @Valid ProdottoRequestDTO productDTO,
-            @RequestHeader("X-User-Id") UUID sellerId) { // Simulazione header di autenticazione
+            @RequestBody @Valid ProdottoRequestDTO productDTO) { // Simulazione header di autenticazione
+
+        UUID sellerId = currentUserService.getCurrentUserId();
 
         ProductResponseDTO createdProduct = service.createProduct(productDTO, sellerId);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
@@ -48,12 +71,29 @@ public class VenditoreController {
     }
 
 
+    /*
+        @PostMapping("/create-product")
+        public ResponseEntity<Prodotto> createProduct(
+                @RequestParam @NotNull UUID venditor,
+                @RequestParam @NotBlank String name,
+                @RequestParam @NotBlank String descrizione,
+                @RequestParam @DecimalMin(value = "0.01", message = "Price must be greater than 0") double price,
+                @RequestParam @Min(value = 1, message = "Quantity must be greater than 0") int quantity,
+                @RequestParam @NotBlank String certification) {
+
+            Prodotto product = service.createProduct(venditor, name, descrizione, price, quantity, certification);
+            return ResponseEntity.status(HttpStatus.CREATED).body(product);
+        }
+
+
+     */
     @PutMapping("/update-product")
     public ResponseEntity<ProductResponseDTO> updateProduct(
             @PathVariable UUID productId,
-            @RequestBody @Valid ProdottoRequestDTO productDTO ,
-            @RequestHeader("X-User-Id") UUID sellerId) { // Simulazione header di autenticazione
+            @RequestBody @Valid ProdottoRequestDTO productDTO) { // Simulazione header di autenticazione
 
+
+        UUID sellerId = currentUserService.getCurrentUserId();
 
         ProductResponseDTO product = service.updateProduct(productId, productDTO , sellerId);
         return ResponseEntity.ok(product);

@@ -4,7 +4,7 @@ import com.filiera.exception.InsufficientQuantityException;
 import com.filiera.exception.ProductNotFoundException;
 import com.filiera.exception.SellerNotFoundException;
 
-import com.filiera.model.adapter.PacchettoMapper;
+import com.filiera.adapter.PacchettoMapper;
 import com.filiera.model.dto.PacchettoRequestDTO;
 import com.filiera.model.dto.PacchettoResponseDTO;
 import com.filiera.model.products.Pacchetto;

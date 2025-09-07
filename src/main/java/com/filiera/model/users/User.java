@@ -1,6 +1,7 @@
 package com.filiera.model.users;
 
 
+import com.filiera.Observer.Observer;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Setter // Genera tutti i setter per tutti i campi
 @NoArgsConstructor // Genera il costruttore senza argomenti, necessario per JPA
 @SuperBuilder // Permette di usare il pattern Builder e funziona con l'ereditarietà
-public abstract class User {
+public abstract class User implements Observer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID) // Delega la generazione dell'UUID a JPA/Hibernate
@@ -41,5 +42,13 @@ public abstract class User {
     @Column(nullable = false)
     @NotNull(message = "Role cannot be null")// Il ruolo non può essere null
     private RuoloUser role;
+
+
+    @Override
+    public void update(String message) {
+        // Here you implement the notification logic.
+        // For example, you could send an email, a push notification, or save it to a notification table.
+        System.out.println("Notifica ricevuta per l'utente " + this.getName() + ": " + message);
+    }
 
 }

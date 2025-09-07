@@ -1,7 +1,7 @@
 package com.filiera.services;
 
 import com.filiera.exception.*;
-import com.filiera.model.adapter.ProdottoMapper;
+import com.filiera.adapter.ProdottoMapper;
 import com.filiera.model.dto.ProdottoRequestDTO;
 import com.filiera.model.dto.ProductResponseDTO;
 import com.filiera.model.products.Prodotto;

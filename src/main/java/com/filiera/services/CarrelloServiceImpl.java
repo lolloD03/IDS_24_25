@@ -3,7 +3,7 @@ package com.filiera.services;
 import com.filiera.exception.BuyerNotFoundException;
 import com.filiera.exception.EmptyCartException;
 import com.filiera.exception.ProductNotFoundException;
-import com.filiera.model.adapter.CarrelloOrdineMapper;
+import com.filiera.adapter.CarrelloOrdineMapper;
 import com.filiera.model.dto.CarrelloResponseDTO;
 import com.filiera.model.dto.OrdineResponseDTO;
 import com.filiera.model.payment.Carrello;

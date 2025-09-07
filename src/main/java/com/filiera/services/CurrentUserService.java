@@ -1,6 +1,6 @@
 package com.filiera.services;
 
-import com.filiera.Security.CustomUserDetails;
+import com.filiera.security.CustomUserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

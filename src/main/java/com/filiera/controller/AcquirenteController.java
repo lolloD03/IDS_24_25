@@ -67,21 +67,6 @@ public class AcquirenteController {
         return ResponseEntity.ok(prodotti);
     }
 
-    /*
-    @PostMapping("/invoice")
-    public ResponseEntity<StringBuilder> getInvoice(@RequestParam @NotNull (message = "Buyer ID cannot be null") UUID buyerId) {
-
-        log.info("Generating invoice for buyer {}", buyerId);
-
-        Carrello carrello = service.getCarrello(buyerId);
-
-        StringBuilder invoice = service.getInvoice(buyerId);
-
-        log.info("Invoice successfully generated for buyer {}", buyerId);
-        return ResponseEntity.ok(invoice);
-
-    }*/
-
 
     @PostMapping("/clear")
     public ResponseEntity<Void> clearCart() {
@@ -94,7 +79,7 @@ public class AcquirenteController {
         return ResponseEntity.noContent().build(); // 204 No Content è più appropriato
     }
 
-    @GetMapping
+    @GetMapping("/carrello")
     public ResponseEntity<CarrelloResponseDTO> getCart() {
         UUID buyerId = currentUserService.getCurrentUserId();
         log.debug("Retrieving cart for buyer {}", buyerId);

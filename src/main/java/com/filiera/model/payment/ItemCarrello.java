@@ -1,5 +1,6 @@
 package com.filiera.model.payment;
 
+import com.filiera.model.products.Pacchetto;
 import com.filiera.model.products.Prodotto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,9 +15,15 @@ import java.util.UUID;
 @Entity
 public class ItemCarrello {
 
-    @ManyToOne(fetch = FetchType.LAZY) // Evita di caricare il Prodotto a meno che non sia necessario
-    @JoinColumn(name = "product_id", nullable = false) // Assicura che l'ItemCarrello sia sempre legato a un Prodotto
+    // Relazione con Prodotto. Sarà null se l'item è un Pacchetto.
+    @ManyToOne
+    @JoinColumn(name = "prodotto_id", insertable = false, updatable = false)
     private Prodotto product;
+
+    // Relazione con Pacchetto. Sarà null se l'item è un Prodotto.
+    @ManyToOne
+    @JoinColumn(name = "pacchetto_id", insertable = false, updatable = false)
+    private Pacchetto pacchetto;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "carrello_id", nullable = false) // Assicura che l'ItemCarrello sia sempre legato a un Carrello

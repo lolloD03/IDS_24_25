@@ -28,12 +28,15 @@ public class PacchettoService {
     private final InMemoryProductRepository prodottoRepo;
     private final InMemoryUserRepository venditoreRepo;
     private final PacchettoMapper pacchettoMapper;
+    private final ProductServiceImpl productService;
 
-    public PacchettoService(InMemoryPacchettoRepository pacchettoRepo, InMemoryProductRepository prodottoRepo, InMemoryUserRepository venditoreRepo, PacchettoMapper pacchettoMapper) {
+
+    public PacchettoService(InMemoryPacchettoRepository pacchettoRepo, InMemoryProductRepository prodottoRepo, InMemoryUserRepository venditoreRepo, PacchettoMapper pacchettoMapper, ProductServiceImpl prodService) {
         this.pacchettoRepo = pacchettoRepo;
         this.prodottoRepo = prodottoRepo;
         this.venditoreRepo = venditoreRepo;
         this.pacchettoMapper = pacchettoMapper;
+        this.productService = prodService;
 
     }
 
@@ -55,6 +58,7 @@ public class PacchettoService {
         request.getProductIds().forEach(productId -> {
             Prodotto prodotto = prodottoRepo.findById(productId)
                     .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con id: " + productId));
+            productService.checkProductState(productId);
             pacchetto.getProducts().add(prodotto); // OPZIONALE , CREARE UN METODO SU PACCHETTO INVECE CHE UTILIZZARE IL METODO DA QUA
         });
 

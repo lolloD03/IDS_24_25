@@ -72,8 +72,10 @@ public class VenditoreController {
     }
 
     @DeleteMapping("/delete-product")
+
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
-        service.deleteProduct(productId);
+        UUID sellerId = currentUserService.getCurrentUserId();
+        service.deleteProduct(productId,sellerId);
         return ResponseEntity.noContent().build();
     }
 

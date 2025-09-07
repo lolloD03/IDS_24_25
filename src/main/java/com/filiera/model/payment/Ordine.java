@@ -41,14 +41,4 @@ public class Ordine {
         return items.stream().mapToDouble(ItemOrdine::getTotal).sum();
     }
 
-
-    public void addItem(ItemOrdine item) {
-        this.items.add(item);
-        item.setOrder(this);
-    }
-
-    public void removeItem(ItemOrdine item) {
-        this.items.remove(item);
-        item.setOrder(null);
-    }
 }

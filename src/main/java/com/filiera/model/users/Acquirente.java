@@ -1,6 +1,7 @@
 package com.filiera.model.users;
 
 
+import com.filiera.model.OsmMap.Indirizzo;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -18,5 +19,6 @@ import lombok.experimental.SuperBuilder;
 @ToString(callSuper = true) // Genera un toString che include anche i campi della classe padre
 public class Acquirente extends User {
 
+    Indirizzo indirizzo;
 
 }

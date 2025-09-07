@@ -1,36 +1,31 @@
 package com.filiera.model.sellers;
 
-import com.filiera.model.products.Prodotto;
-import com.filiera.model.users.RuoloUser;
+import com.filiera.model.products.Pacchetto;
+import jakarta.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.OneToMany;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
+@SuperBuilder
+@NoArgsConstructor
+@Entity
+@DiscriminatorValue("DISTRIBUTORE")
+@Getter
+@Setter
 public class DistributoreTipicita extends Venditore {
-/*
-    private List<Prodotto> productsBundle;
-    private List<List<Prodotto>> listOfBundles;
 
-    public DistributoreTipicita() {
-        super();
-    }
+    @OneToMany(mappedBy = "seller")
+    @Builder.Default // <-- Important: Tells the builder to use this default initialization
+    private List<Pacchetto> pacchetti = new ArrayList<>();
 
 
-    public DistributoreTipicita(String password, String email, String name, RuoloUser ruoloUser, int partitaIva) {
-        super( password, email, name, ruoloUser , partitaIva);
-    }
 
-    public void addToBundle(Prodotto prodotto) {
-        productsBundle.add(prodotto);
-    }
-
-    public void removeFromBundle(Prodotto prodotto) {productsBundle.remove(prodotto);}
-
-    public void addToListOfBundles(List<Prodotto> bundleOfproducts) {listOfBundles.add(bundleOfproducts);}
-
-    public void removeFromListOfBundles(List<Prodotto> bundleOfproducts) {listOfBundles.remove(bundleOfproducts);}
-
-
- */
 }
 

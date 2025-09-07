@@ -1,11 +1,12 @@
 package com.filiera.services;
 
 import com.filiera.exception.*;
+import com.filiera.model.adapter.ProdottoMapper;
 import com.filiera.model.dto.ProdottoRequestDTO;
 import com.filiera.model.dto.ProductResponseDTO;
-import com.filiera.model.dto.SellerResponseDTO;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.sellers.Venditore;
+import com.filiera.repository.InMemoryUserRepository;
 import org.springframework.transaction.annotation.Transactional;
 import com.filiera.model.products.StatoProdotto;
 import com.filiera.repository.InMemoryProductRepository;
@@ -27,12 +28,14 @@ public class ProductServiceImpl implements ProductService {
     private static final Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     private final InMemoryProductRepository prodRepo;
-    private final InMemoryVenditoreRepository vendRepo;
+    private final InMemoryUserRepository vendRepo;
+    private final ProdottoMapper prodottoMapper;
 
     @Autowired
-    public ProductServiceImpl(InMemoryProductRepository prodRepo, InMemoryVenditoreRepository vendRepo) {
+    public ProductServiceImpl(InMemoryProductRepository prodRepo, InMemoryUserRepository vendRepo,  ProdottoMapper prodottoMapper) {
         this.prodRepo = prodRepo;
         this.vendRepo = vendRepo;
+        this.prodottoMapper = prodottoMapper;
     }
 
 
@@ -44,7 +47,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponseDTO> listAll() { // Changed return type
         logger.debug("Retrieving all products");
         return prodRepo.findAll().stream()
-                .map(this::mapToProdottoResponseDTO)
+                .map(prodottoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +57,7 @@ public class ProductServiceImpl implements ProductService {
         logger.debug("Retrieving product with id: {}", id);
         Prodotto prodotto = prodRepo.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " doesn't exist."));
-        return Optional.of(mapToProdottoResponseDTO(prodotto));
+        return Optional.of(prodottoMapper.toDTO(prodotto));
     }
 
     @Override
@@ -62,49 +65,18 @@ public class ProductServiceImpl implements ProductService {
         logger.info("Creating new product from request DTO for vendor: {}", sellerId);
 
         // Find seller
-        Venditore seller = vendRepo.findById(sellerId)
+        Venditore seller = (Venditore) vendRepo.findById(sellerId)
                 .orElseThrow(() -> new SellerNotFoundException("Seller not found with Id: " + sellerId));
 
         // Create and save product
-        Prodotto product = Prodotto.builder()
-                .name(productRequestDTO.getName())
-                .description(productRequestDTO.getDescription())
-                .price(productRequestDTO.getPrice())
-                .availableQuantity(productRequestDTO.getQuantity())
-                .certification(productRequestDTO.getCertification())
-                .expirationDate(productRequestDTO.getExpirationDate()) // Se presente
-                .seller(seller)
-                .build();
+        Prodotto product = prodottoMapper.toEntity(productRequestDTO, seller);
 
         Prodotto savedProduct = prodRepo.save(product);
         seller.addProduct(savedProduct);
 
         logger.info("Product created successfully with id: {}", savedProduct.getId());
-        return mapToProdottoResponseDTO(savedProduct);
+        return prodottoMapper.toDTO(savedProduct);
     }
-
-    /*
-    @Override
-    public Prodotto createProduct(UUID sellerId, String name, String descrizione, double price, int quantity, String certification) {
-        logger.info("Creating new product for seller: {}", sellerId);
-
-        // Validate input parameters
-        validateProductInput(name, descrizione, price, quantity, certification);
-
-        // Find seller
-        Venditore venditore = vendRepo.findById(sellerId)
-                .orElseThrow(() -> new ProductNotFoundException("Venditore non trovato con id: " + sellerId));
-
-        // Create and save product
-        Prodotto prodotto = Prodotto.creaProdotto(name, descrizione, price, quantity, venditore, certification);
-        Prodotto savedProduct = prodRepo.save(prodotto);
-
-        logger.info("Product created successfully with id: {}", savedProduct.getId());
-        return savedProduct;
-    }
-
-
-     */
 
 
     public Optional<Prodotto> getByIdEntity(UUID id) {
@@ -141,11 +113,11 @@ public class ProductServiceImpl implements ProductService {
         // 5. Salva il prodotto aggiornato
         Prodotto updatedProduct = prodRepo.save(existingProduct);
         logger.info("Prodotto aggiornato con successo con id: {}", updatedProduct.getId());
-        return mapToProdottoResponseDTO(updatedProduct);
+        return prodottoMapper.toDTO(updatedProduct);
     }
 
     @Override
-    public void deleteProduct(UUID productId) {
+    public void deleteProduct(UUID productId, UUID sellerId) {
 
 
         logger.info("Deleting product with id: {}", productId);
@@ -155,16 +127,23 @@ public class ProductServiceImpl implements ProductService {
             throw new ProductNotFoundException("Product with ID  " + productId + " doesn't exist.");
         }
 
+        Venditore seller = (Venditore) vendRepo.findById(sellerId)
+                .orElseThrow(() -> new SellerNotFoundException("Seller not found with Id: " + sellerId));
+
+
+        Prodotto product = prodRepo.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with ID: " + productId));
+
+        seller.removeProduct(product);
         prodRepo.deleteById(productId);
         logger.info("Product deleted successfully with id: {}", productId);
     }
-
     @Override
     @Transactional(readOnly = true)
     public List<ProductResponseDTO> getApprovedProducts() { // Changed return type
         logger.debug("Retrieving approved products");
         return prodRepo.findByState(StatoProdotto.APPROVED).stream()
-                .map(this::mapToProdottoResponseDTO)
+                .map(prodottoMapper::toDTO)
                 .collect(Collectors.toList());
     }
 
@@ -218,30 +197,4 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
-    // --- Helper method to map Prodotto entity to ProdottoResponseDTO ---
-    private ProductResponseDTO mapToProdottoResponseDTO(Prodotto prodotto) {
-        if (prodotto == null) {
-            return null;
-        }
-        // Assuming your Venditore entity has getName() or getCompanyName()
-        SellerResponseDTO sellerDTO = null;
-        if (prodotto.getSeller() != null) {
-            sellerDTO = SellerResponseDTO.builder()
-                    .id(prodotto.getSeller().getId())
-                    .name(prodotto.getSeller().getName()) // Adjust based on your Venditore fields
-                    .build();
-        }
-
-        return ProductResponseDTO.builder()
-                .id(prodotto.getId())
-                .name(prodotto.getName())
-                .description(prodotto.getDescription())
-                .price(prodotto.getPrice())
-                .availableQuantity(prodotto.getAvailableQuantity())
-                .certification(prodotto.getCertification())
-                .expirationDate(prodotto.getExpirationDate())
-                .state(prodotto.getState().name()) // Convert enum to String
-                .seller(sellerDTO)
-                .build();
-    }
 }

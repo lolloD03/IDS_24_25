@@ -17,7 +17,7 @@ public interface ProductService {
 
     ProductResponseDTO updateProduct(UUID prodottoId, ProdottoRequestDTO prodottoRequestDTO , UUID venditoreId);
 
-    void deleteProduct(UUID prodottoId);
+    void deleteProduct(UUID prodottoId , UUID sellerId);
 
     public List<ProductResponseDTO> getApprovedProducts();
 

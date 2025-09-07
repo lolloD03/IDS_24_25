@@ -28,7 +28,7 @@ import java.util.UUID;
 @Transactional
 public class CarrelloServiceImpl {
 
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
     private final InMemoryCarrelloRepository cartRepo;
 
@@ -40,7 +40,7 @@ public class CarrelloServiceImpl {
 
     private final CarrelloOrdineMapper  mapper;
 
-    public CarrelloServiceImpl(ProductService productService , InMemoryCarrelloRepository cartRepo, InMemoryUserRepository buyerRepo, InMemoryOrdineRepository ordineRepo,  CarrelloOrdineMapper mapper,  PacchettoService pacchettoService ) {
+    public CarrelloServiceImpl(ProductServiceImpl productService , InMemoryCarrelloRepository cartRepo, InMemoryUserRepository buyerRepo, InMemoryOrdineRepository ordineRepo,  CarrelloOrdineMapper mapper,  PacchettoService pacchettoService ) {
         this.cartRepo = cartRepo;
         this.productService = productService;
         this.buyerRepo = buyerRepo;

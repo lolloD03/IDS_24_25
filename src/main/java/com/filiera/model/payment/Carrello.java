@@ -31,8 +31,6 @@ public class Carrello {
     @JoinColumn(name = "buyer_id", referencedColumnName = "id") // Nome della colonna FK e della PK di Acquirente
     private Acquirente buyer;
 
-    //private double totalPrice;
-
 
     public Carrello(List<ItemCarrello> products , Acquirente buyer) {
         this.products = products;

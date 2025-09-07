@@ -6,6 +6,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -17,6 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 public class AnimatoreFiliera extends User {
 
     // Lista degli eventi organizzati da questo animatore

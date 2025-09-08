@@ -70,7 +70,6 @@ public class PacchettoService {
     }
 
 
-    // Method to decrease the quantity of a package
     public void decreaseQuantity(UUID pacchettoId, int quantityToDeduct) {
         Pacchetto pacchetto = pacchettoRepo.findById(pacchettoId)
                 .orElseThrow(() -> new ProductNotFoundException("Pacchetto not found with id: " + pacchettoId));

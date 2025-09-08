@@ -29,7 +29,6 @@ public class Ordine {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemOrdine> items = new ArrayList<>();
 
-    //private double totale;
 
     private LocalDate dataOrdine;
 

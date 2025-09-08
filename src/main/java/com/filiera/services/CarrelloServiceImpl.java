@@ -67,7 +67,6 @@ public class CarrelloServiceImpl {
     public CarrelloResponseDTO removeProduct(UUID productId , int quantity , UUID buyerId) {
         Prodotto product = productService.getByIdEntity(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product with Id " + productId + " doesn't exist."));
-// ...
 
         Carrello cart = getCartEntity(buyerId);
 

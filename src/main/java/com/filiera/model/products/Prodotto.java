@@ -12,9 +12,6 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 import java.util.UUID;
 @Entity
-// @DiscriminatorColumn non è necessario su una classe che non è parte di una gerarchia di ereditarietà JPA.
-// Se Prodotto fosse classe base per altri tipi di prodotti (es. ProdottoAgricolo, ProdottoArtigianale),
-// allora avrebbe senso. Ma in base al tuo schema, Prodotto è una classe concreta.
 @Data // Genera getter, setter, equals, hashCode, toString
 @NoArgsConstructor // Costruttore senza argomenti per JPA
 // Abilita il pattern Builder per una creazione oggetti fluida
@@ -60,8 +57,7 @@ public class Prodotto {
 
     private String certification; // Potrebbe essere nullable = true per default
 
-    // --- Lifecycle Callbacks JPA ---
-    // Questo metodo viene eseguito prima che l'entità venga salvata per la prima volta
+
     @PrePersist
     public void prePersist() {
         if (this.state == null) {
@@ -70,8 +66,6 @@ public class Prodotto {
 
     }
 
-    // --- Metodi con Logica di Business ---
-    // Nota: I getter e setter standard sono forniti da @Data
 
 
     public void approveBy(Curatore curator) {

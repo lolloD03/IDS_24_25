@@ -151,26 +151,21 @@ public class ProductServiceImpl implements ProductService {
     public void decreaseQuantity(UUID productId, int quantity) {
         logger.info("Reducing quantity for product: {} by {}", productId, quantity);
 
-        // Validate quantity
         if (quantity <= 0) {
             throw new InsufficientQuantityException("Quantity to decrease must be greater than zero.");
         }
 
-        // Find product
         Prodotto product = prodRepo.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product with ID " + productId + " doesn't exist."));
 
-        // Check available quantity
         if (product.getAvailableQuantity() < quantity) {
             throw new InsufficientQuantityException("Unavailable quantity for product with ID " + productId +
                     ". Available: " + product.getAvailableQuantity() + ", Request: " + quantity);
         }
 
-        // Update quantity
         int newQuantity = product.getAvailableQuantity() - quantity;
         product.setAvailableQuantity(newQuantity);
 
-        // Update state if necessary
         if (newQuantity == 0) {
             product.setState(StatoProdotto.OUT_OF_STOCK);
             logger.info("Product {} is now out of stock", productId);

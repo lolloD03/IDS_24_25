@@ -46,8 +46,6 @@ public abstract class User implements Observer {
 
     @Override
     public void update(String message) {
-        // Here you implement the notification logic.
-        // For example, you could send an email, a push notification, or save it to a notification table.
         System.out.println("Notifica ricevuta per l'utente " + this.getName() + ": " + message);
     }
 

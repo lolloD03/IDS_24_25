@@ -43,7 +43,6 @@ public class VenditoreController {
         // Ottieni l'ID del venditore autenticato dal contesto di sicurezza
 
         UUID sellerId = currentUserService.getCurrentUserId();
-
         // Chiama il service per la logica di business
         PacchettoResponseDTO createdPacchetto = pacchettoService.createPacchetto(request, sellerId);
 

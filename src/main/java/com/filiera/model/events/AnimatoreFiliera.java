@@ -25,5 +25,4 @@ public class AnimatoreFiliera extends User {
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Evento> organizedEvents = new HashSet<>();
 
-    // ... altri campi specifici
 }

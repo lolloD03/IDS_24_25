@@ -41,23 +41,19 @@ public class AnimatoreService {
 
         Set<User> invitedUsers = new HashSet<>(userRepo.findAllById(request.getInvitedUserIds()));
         evento.setInvitedUsers(invitedUsers);
-        // For each invited user, register them as an observer of this specific event
         invitedUsers.forEach(evento::attach);
 
         Evento savedEvento = eventoRepo.save(evento);
 
-        // Notify all registered observers after the event is successfully saved
         savedEvento.notifyObservers();
 
         return savedEvento;
     }
 
     public void deleteEvent(UUID eventId) {
-        // Find the event to ensure it exists before attempting to delete it
         Evento eventToDelete = eventoRepo.findById(eventId)
                 .orElseThrow(() -> new EventNotFoundException("Evento non trovato con id: " + eventId));
 
-        // Delete the event
         eventoRepo.delete(eventToDelete);
     }
 }

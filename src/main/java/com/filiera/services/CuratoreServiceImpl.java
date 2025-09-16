@@ -65,17 +65,13 @@ public class CuratoreServiceImpl {
     public Prodotto rejectProduct(UUID productId, UUID curatorId) {
         log.info("Rejecting product {} by curator {}", productId, curatorId);
 
-        // Validate input parameters
         validateIds(productId, curatorId);
 
-        // Find and validate product
         Prodotto product = findProductById(productId);
         validateProductForApproval(product);
 
-        // Find and validate curator
         Curatore curator = findCuratorById(curatorId);
 
-        // Reject product
         product.rejectBy(curator);
         Prodotto rejectedProduct = productRepository.save(product);
 
@@ -104,7 +100,6 @@ public class CuratoreServiceImpl {
         return productRepository.findByState(StatoProdotto.REJECTED);
     }
 
-    // Private helper methods
     private void validateIds(UUID productId, UUID curatorId) {
         if (productId == null) {
             throw new IllegalArgumentException("Product ID can't be null");

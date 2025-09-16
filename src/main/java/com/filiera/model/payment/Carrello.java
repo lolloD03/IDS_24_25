@@ -86,8 +86,6 @@ public class Carrello {
                                 // Nota: Se ItemCarrello ha orphanRemoval=true, questo lo eliminerà dal DB.
                             }
                         },
-                        // Se il prodotto non è nel carrello, potresti lanciare un'eccezione
-                        // o semplicemente non fare nulla (dipende dalla logica di business desiderata)
                         () -> {
                             throw new ProductNotFoundException("Product " + product.getName() + " is not in the cart");
                         }

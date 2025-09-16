@@ -2,6 +2,7 @@ package com.filiera;
 
 import com.filiera.model.OsmMap.Indirizzo;
 import com.filiera.model.administration.Curatore;
+import com.filiera.model.products.Pacchetto;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
 import com.filiera.model.sellers.DistributoreTipicita;
@@ -10,6 +11,7 @@ import com.filiera.model.sellers.Venditore;
 import com.filiera.model.users.Acquirente;
 import com.filiera.model.users.RuoloUser;
 import com.filiera.repository.*;
+import com.filiera.services.CarrelloServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +19,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
 
 
 @SpringBootApplication
@@ -35,7 +39,8 @@ public class FilieraApplication implements CommandLineRunner {
     @Autowired
     InMemoryProductRepository prodottiRepository;
 
-
+    @Autowired
+    InMemoryPacchettoRepository pacchettoRepository;
 
     @Autowired
     InMemoryUserRepository userRepository;
@@ -43,13 +48,15 @@ public class FilieraApplication implements CommandLineRunner {
     @Autowired
     InMemoryCarrelloRepository carrelloRepository;
 
+    @Autowired
+    CarrelloServiceImpl carrelloService;
+
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Override
     public void run(String... args) throws Exception {
-
 
 
         Indirizzo indirizzo1 = new Indirizzo("Milano" , "ViaMilano" , "1");
@@ -126,15 +133,42 @@ public class FilieraApplication implements CommandLineRunner {
                 .seller(venditore2)
                 .build();
 
-        prodottiRepository.save(pomodoro);
-        prodottiRepository.save(patata);
-        prodottiRepository.save(passataDiPomodoro);
+        Prodotto cipolla = Prodotto.builder()
+                .name("cipolla")
+                .description("Trasformated")
+                .price(4.99)
+                .availableQuantity(2)
+                .certification("DOP")
+                .expirationDate(LocalDate.of(2025, 10, 5)) // Se presente
+                .seller(venditore1)
+                .build();
+
+        cipolla.setState(StatoProdotto.APPROVED);
+
+        Prodotto anguria = Prodotto.builder()
+                .name("Anguria")
+                .description("Trasformated")
+                .price(10.99)
+                .availableQuantity(1)
+                .certification("DOP")
+                .expirationDate(LocalDate.of(2025, 10, 5)) // Se presente
+                .seller(venditore2)
+                .build();
+
+        anguria.setState(StatoProdotto.APPROVED);
 
 
-
+        venditore1.addProduct(cipolla);
+        venditore2.addProduct(anguria);
         venditore1.addProduct(pomodoro);
         venditore1.addProduct(patata);
         venditore2.addProduct(passataDiPomodoro);
+
+        prodottiRepository.save(pomodoro);
+        prodottiRepository.save(patata);
+        prodottiRepository.save(passataDiPomodoro);
+        prodottiRepository.save(anguria);
+        prodottiRepository.save(cipolla);
 
 
         Curatore curatore = Curatore.builder()
@@ -160,17 +194,40 @@ public class FilieraApplication implements CommandLineRunner {
                 .password(passwordEncoder.encode("password"))
                 .build();
 
-
-
-
-        System.out.println(venditore1.getId());
-
         userRepository.save(curatore);
+
+        pomodoro.approveBy(curatore);
+        cipolla.approveBy(curatore);
+        anguria.approveBy(curatore);
+
 
         userRepository.save(buyer1);
         userRepository.save(buyer2);
         userRepository.save(distributoreTipicita);
 
+        Pacchetto pacchettoTipicità = Pacchetto.builder()
+                .name("Pacchetto")
+                .description("Oggetti")
+                .price(20)
+                .availableQuantity(3)
+                .seller(distributoreTipicita)
+                .products(Set.of(cipolla,anguria,pomodoro))
+                .build();
+
+        pacchettoRepository.save(pacchettoTipicità);
+
+
+
+        System.out.println("Pacchettotipicità ID: " + pacchettoTipicità.getId());
+        System.out.println("Venditore1 ID: "+ venditore1.getId());
+        System.out.println("Venditore2 ID: "+ venditore2.getId());
+        System.out.println("Pomodoro (approved) ID: "+ pomodoro.getId());
+        System.out.println("Passata di pomodoro ID: " + passataDiPomodoro.getId());
+        System.out.println("Cipolla (approved) ID: " + cipolla.getId());
+        System.out.println("Anguria (approved) ID: " + anguria.getId());
+        System.out.println("Patata ID: " + patata.getId());
 
     }
+
+
 }

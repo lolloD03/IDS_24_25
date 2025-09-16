@@ -17,12 +17,12 @@ public class ItemCarrello {
 
     // Relazione con Prodotto. Sarà null se l'item è un Pacchetto.
     @ManyToOne
-    @JoinColumn(name = "prodotto_id", insertable = false, updatable = false)
+    @JoinColumn(name = "prodotto_id")
     private Prodotto product;
 
     // Relazione con Pacchetto. Sarà null se l'item è un Prodotto.
     @ManyToOne
-    @JoinColumn(name = "pacchetto_id", insertable = false, updatable = false)
+    @JoinColumn(name = "pacchetto_id")
     private Pacchetto pacchetto;
 
     @ManyToOne(fetch = FetchType.LAZY)

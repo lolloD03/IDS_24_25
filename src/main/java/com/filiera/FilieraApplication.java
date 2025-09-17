@@ -2,6 +2,8 @@ package com.filiera;
 
 import com.filiera.model.OsmMap.Indirizzo;
 import com.filiera.model.administration.Curatore;
+import com.filiera.model.payment.Carrello;
+import com.filiera.model.payment.ItemCarrello;
 import com.filiera.model.products.Pacchetto;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
@@ -216,7 +218,12 @@ public class FilieraApplication implements CommandLineRunner {
 
         pacchettoRepository.save(pacchettoTipicità);
 
-
+        ItemCarrello pacchetto = new ItemCarrello();
+        pacchetto.setPacchetto(pacchettoTipicità);
+        Carrello carrello = carrelloService.loadOrCreateCart(buyer2.getId());
+        pacchetto.setCart(carrello);
+        carrello.getProducts().add(pacchetto);
+        carrelloRepository.save(carrello);
 
         System.out.println("Pacchettotipicità ID: " + pacchettoTipicità.getId());
         System.out.println("Venditore1 ID: "+ venditore1.getId());

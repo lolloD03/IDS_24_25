@@ -6,4 +6,5 @@ public enum StatoProdotto {
     APPROVED,
     REJECTED,
     OUT_OF_STOCK,
+
 }

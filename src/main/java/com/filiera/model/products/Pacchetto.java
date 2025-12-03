@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Getter
@@ -37,14 +35,29 @@ public class Pacchetto {
     @JoinColumn(name = "seller_id", nullable = false)
     private Venditore seller;
 
-    // Relazione molti a molti con i prodotti.
-    // Viene creata una tabella di join per gestire il mapping.
-    @ManyToMany
-    @JoinTable(
-            name = "pacchetto_prodotto",
-            joinColumns = @JoinColumn(name = "pacchetto_id"),
-            inverseJoinColumns = @JoinColumn(name = "prodotto_id")
-    )
+
+    @ElementCollection
     @Builder.Default
-    private Set<Prodotto> products = new HashSet<>();
+    private List<ProductSnapshot> productSnapshots = new ArrayList<>();
+
+    public void addProduct(Prodotto prodotto) {
+        productSnapshots.add(new ProductSnapshot(prodotto));
+    }
+
+    @Embeddable
+    @Getter
+    @Setter
+    public static class ProductSnapshot {
+        private String name;
+        private String description;
+        private double price;
+
+        public ProductSnapshot() {}
+
+        public ProductSnapshot(Prodotto prodotto) {
+            this.name = prodotto.getName();
+            this.description = prodotto.getDescription();
+            this.price = prodotto.getPrice();
+        }
+    }
 }

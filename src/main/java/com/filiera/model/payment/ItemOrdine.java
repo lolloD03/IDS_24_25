@@ -10,24 +10,22 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor // Necessario per JPA
+@NoArgsConstructor
 public class ItemOrdine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id; // ID univoco per questo specifico elemento dell'ordine
+    private UUID id;
 
-    // Dati "snapshot" del prodotto al momento dell'acquisto
-    private UUID productId;     // L'ID del Prodotto originale, per riferimento
+    private UUID productId;
     private String productName;
     private double productPrice;
     private int quantity;
 
-    @ManyToOne // Molti ItemOrdine possono appartenere a un solo Ordine
-    @JoinColumn(name = "ordine_id", nullable = false) // Colonna FK che punta all'Ordine
-    private Ordine order; // Riferimento all'Ordine a cui appartiene questo ItemOrdine
+    @ManyToOne
+    @JoinColumn(name = "ordine_id", nullable = false)
+    private Ordine order;
 
-    // Costruttore per creare un ItemOrdine dallo snapshot del Carrello/Prodotto
     public ItemOrdine(UUID productId, String productName, double productPrice, int quantity) {
         this.productId = productId;
         this.productName = productName;

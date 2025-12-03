@@ -1,13 +1,11 @@
 package com.filiera.controller;
+import com.filiera.model.dto.EventoSimpleDTO;
+import com.filiera.model.dto.PacchettoResponseDTO;
 import com.filiera.model.dto.ProductResponseDTO;
 import com.filiera.model.dto.VenditoreIndirizzoDTO;
-import com.filiera.services.MapService;
-import com.filiera.services.ProductService;
+import com.filiera.services.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,18 +14,27 @@ import java.util.UUID;
 @RequestMapping("/public")
 public class PublicController {
 
-    private final ProductService service;
+    private final ProdottoQueryService service;
     private final MapService mapService;
+    private final PacchettoQueryService pacchettoService;
+    private final EventQueryService eventQueryService;
 
-    public PublicController(ProductService service, MapService mapService) {
+    public PublicController(EventQueryService eventQueryService,ProdottoQueryService service, MapService mapService, PacchettoQueryService pacchettoService) {
         this.service = service;
         this.mapService = mapService;
+        this.pacchettoService = pacchettoService;
+        this.eventQueryService = eventQueryService;
     }
 
     @GetMapping("/products")
     public ResponseEntity<List<ProductResponseDTO>> getApprovedProducts() {
         List<ProductResponseDTO> products = service.getApprovedProducts();
         return ResponseEntity.ok(products);
+    }
+    @GetMapping("/bundles")
+    public ResponseEntity<List<PacchettoResponseDTO>> getBundles() {
+        List<PacchettoResponseDTO> bundles = pacchettoService.getAllPacchetti();
+        return ResponseEntity.ok(bundles);
     }
 
     @GetMapping("/map")
@@ -41,5 +48,18 @@ public class PublicController {
         String address = mapService.getVendorAddressById(vendorId);
         return ResponseEntity.ok(address);
     }
+
+    @GetMapping("/eventi")
+    public ResponseEntity<List<EventoSimpleDTO>> getAllEvents() {
+        List<EventoSimpleDTO> eventi = eventQueryService.getEventsDTO();
+        return ResponseEntity.ok(eventi);
+    }
+
+    @PostMapping("/{prodottoId}/condividi")
+    public ResponseEntity<String> condividiProdotto(@PathVariable UUID prodottoId) {
+        service.condividiProdotto(prodottoId);
+        return ResponseEntity.ok("Prodotto condiviso sui social!");
+    }
+
 
 }

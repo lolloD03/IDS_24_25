@@ -7,15 +7,14 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-// DTO per rappresentare un singolo prodotto all'interno del carrello
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ItemCarrelloResponseDTO {
-    private UUID productId; // ID del prodotto
-    private String productName; // Nome del prodotto
-    private double unitPrice; // Prezzo unitario del prodotto
-    private int quantity; // Quantità di questo prodotto nel carrello
-    private double subtotal; // Sottototale per questo item (unitPrice * quantity)
+    private UUID productId;
+    private String productName;
+    private double unitPrice;
+    private int quantity;
+    private double subtotal;
 }

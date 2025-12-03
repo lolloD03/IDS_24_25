@@ -20,7 +20,7 @@ public class Ordine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID numeroOrdine; // UUID o codice ordine
+    private UUID numeroOrdine;
 
     @ManyToOne
     @JoinColumn(name = "buyer_id" , nullable = false)
@@ -39,5 +39,6 @@ public class Ordine {
         }
         return items.stream().mapToDouble(ItemOrdine::getTotal).sum();
     }
+
 
 }

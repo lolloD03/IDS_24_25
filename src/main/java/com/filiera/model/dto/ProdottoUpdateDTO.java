@@ -7,17 +7,23 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class OrdineResponseDTO {
-    private UUID id;
-    private UUID buyerId;
-    private LocalDate orderDate;
-    private double totalAmount;
-    private List<ItemCarrelloResponseDTO> items;
+public class ProdottoUpdateDTO {
+
+    private String name;
+
+    private String description;
+
+    private double price;
+
+    private int quantity;
+
+    private List<CertificazioneDTO> certificazioni;
+
+    private LocalDate expirationDate;
 
 }

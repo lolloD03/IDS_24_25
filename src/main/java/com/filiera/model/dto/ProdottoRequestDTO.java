@@ -10,11 +10,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
-@Data // Include @Getter, @Setter, @ToString, @EqualsAndHashCode
-@NoArgsConstructor // Costruttore senza argomenti
-@AllArgsConstructor // Costruttore con tutti gli argomenti
-@Builder // Per creare facilmente istanze (utile nei test)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProdottoRequestDTO {
 
     @NotBlank(message = "The name of the product can not be empty")
@@ -29,8 +30,7 @@ public class ProdottoRequestDTO {
     @Min(value = 1, message = "The quantity have to be greater than 0")
     private int quantity;
 
-    @NotBlank(message = "The certification can not be empty")
-    private String certification;
+    private List<CertificazioneDTO> certificazioni;
 
     @NotNull(message = "The expiration date can not be null")
     private LocalDate expirationDate;

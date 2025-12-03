@@ -12,7 +12,8 @@ public class PacchettoResponseDTO {
     private UUID id;
     private String name;
     private String description;
+    private int quantity;
     private double price;
     private UUID sellerId;
-    private List<ProductResponseDTO> products; // Un elenco di DTO dei prodotti
+    private List<ProductResponseDTO> products;
 }

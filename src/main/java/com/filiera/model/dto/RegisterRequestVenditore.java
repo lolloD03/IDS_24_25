@@ -5,12 +5,10 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class RegisterRequestProduttore extends RegisterRequest{
+public class RegisterRequestVenditore extends RegisterRequestUser {
 
     String città;
     String via;
     String numeroCivico;
     String partitaIva;
-    String processo;
-
 }

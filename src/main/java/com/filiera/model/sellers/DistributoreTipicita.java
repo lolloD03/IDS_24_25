@@ -22,10 +22,16 @@ import java.util.List;
 public class DistributoreTipicita extends Venditore {
 
     @OneToMany(mappedBy = "seller")
-    @Builder.Default // <-- Important: Tells the builder to use this default initialization
+    @Builder.Default
     private List<Pacchetto> pacchetti = new ArrayList<>();
 
 
+    public void addPacchetto(Pacchetto pacchetto) {
+        pacchetti.add(pacchetto);
+    }
 
+    public void removePacchetto(Pacchetto pacchetto) {
+        pacchetti.remove(pacchetto);
+    }
 }
 

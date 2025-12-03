@@ -1,5 +1,6 @@
 package com.filiera.model.events;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.filiera.model.users.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
@@ -21,8 +22,18 @@ import java.util.Set;
 @NoArgsConstructor
 public class AnimatoreFiliera extends User {
 
-    // Lista degli eventi organizzati da questo animatore
     @OneToMany(mappedBy = "organizer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private Set<Evento> organizedEvents = new HashSet<>();
+
+    public void addEvent(Evento event){
+        organizedEvents.add(event);
+    }
+
+    public void removeEvent(Evento event){
+        organizedEvents.remove(event);
+    }
+
+
 
 }

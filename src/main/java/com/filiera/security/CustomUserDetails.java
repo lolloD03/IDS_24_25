@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class CustomUserDetails implements UserDetails {
-    private final User user; // la tua entità JPA
+    private final User user;
 
     public CustomUserDetails(User user) {
         this.user = user;
@@ -41,10 +41,13 @@ public class CustomUserDetails implements UserDetails {
     public boolean isAccountNonLocked() { return true; }
     @Override
     public boolean isCredentialsNonExpired() { return true; }
-    @Override
-    public boolean isEnabled() { return true; }
 
     public User getUser() {  // 👈 così puoi recuperare la tua entità
         return user;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return user.isApproved(); // l’utente è “abilitato” solo se approvato
     }
 }

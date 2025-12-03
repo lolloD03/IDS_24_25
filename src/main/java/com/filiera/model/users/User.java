@@ -13,35 +13,37 @@ import lombok.experimental.SuperBuilder;
 import java.util.UUID;
 
 @Entity
-@Table(name = "app_users") // 'app_users' è un buon nome, coerenza con lo standard
+@Table(name = "app_users")
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "tipo_user", discriminatorType = DiscriminatorType.STRING)
-@Getter // Genera tutti i getter per tutti i campi
-@Setter // Genera tutti i setter per tutti i campi
-@NoArgsConstructor // Genera il costruttore senza argomenti, necessario per JPA
-@SuperBuilder // Permette di usare il pattern Builder e funziona con l'ereditarietà
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
 public abstract class User implements Observer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID) // Delega la generazione dell'UUID a JPA/Hibernate
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
 
     @Column(nullable = false)
-    @NotBlank(message = "Password cannot be blank")// Indica che la password non può essere null
+    @NotBlank(message = "Password cannot be blank")
     private String password;
 
-    @Column(nullable = false, unique = true)// L'email non può essere null e deve essere unica
+    @Column(nullable = false, unique = true)
     private String email;
 
     @Column(nullable = false)
-    @NotBlank(message = "Name cannot be blank")// Il nome non può essere null
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @Enumerated(EnumType.STRING) // Memorizza l'enum come stringa nel DB, più leggibile e robusto
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @NotNull(message = "Role cannot be null")// Il ruolo non può essere null
+    @NotNull(message = "Role cannot be null")
     private RuoloUser role;
+
+    private boolean approved;
 
 
     @Override

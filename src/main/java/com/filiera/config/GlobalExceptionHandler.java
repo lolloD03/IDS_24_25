@@ -7,14 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.filiera.model.dto.ErrorResponse;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 
-    @ControllerAdvice
+@ControllerAdvice
     @Slf4j
     public class GlobalExceptionHandler {
 
-        // Handle custom ProductNotFoundException
+
         @ExceptionHandler(ProductNotFoundException.class)
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
         public ResponseEntity<ErrorResponse> handleProductNotFoundException(ProductNotFoundException ex) {
             log.error("Product not found: {}", ex.getMessage());
             ErrorResponse errorResponse = new ErrorResponse(
@@ -25,7 +27,7 @@ import com.filiera.model.dto.ErrorResponse;
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
 
-        // Handle custom InsufficientQuantityException
+
         @ExceptionHandler(InsufficientQuantityException.class)
         public ResponseEntity<ErrorResponse> handleInsufficientQuantityException(InsufficientQuantityException ex) {
             log.error("Insufficient quantity: {}", ex.getMessage());
@@ -37,7 +39,7 @@ import com.filiera.model.dto.ErrorResponse;
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
 
-        // Handle IllegalArgumentException
+
         @ExceptionHandler(IllegalArgumentException.class)
         public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
             log.error("Invalid argument: {}", ex.getMessage());
@@ -50,7 +52,7 @@ import com.filiera.model.dto.ErrorResponse;
         }
 
 
-        // Handle custom ProductNotPendingException
+
         @ExceptionHandler(ProductNotPendingException.class)
         public ResponseEntity<ErrorResponse> handleProductNotPendingException(ProductNotPendingException ex) {
             log.error("Product not pending approval: {}", ex.getMessage());
@@ -62,19 +64,19 @@ import com.filiera.model.dto.ErrorResponse;
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
 
-        // Handle custom CuratorNotFoundException
+
         @ExceptionHandler(CuratorNotFoundException.class)
-        public ResponseEntity<ErrorResponse> handleCuratorNotFoundException(CuratorNotFoundException ex) {
-            log.error("Curator not found: {}", ex.getMessage());
+        public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException ex) {
+            log.error("User not found: {}", ex.getMessage());
             ErrorResponse errorResponse = new ErrorResponse(
-                    "CURATOR_NOT_FOUND",
+                    "USER_NOT_FOUND",
                     ex.getMessage(),
                     HttpStatus.NOT_FOUND.value()
             );
             return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
         }
 
-        // Handle custom InvalidUserTypeException
+
     @ExceptionHandler(InvalidUserTypeException.class)
     public ResponseEntity<ErrorResponse> handleInvalidUserTypeException(InvalidUserTypeException ex) {
         log.error("Invalid user type: {}", ex.getMessage());
@@ -97,6 +99,66 @@ import com.filiera.model.dto.ErrorResponse;
             return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
         }
 
+        @ExceptionHandler(EmptyCartException.class)
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        public ResponseEntity<ErrorResponse> handleEmptyCartException(EmptyCartException ex) {
+
+            log.warn("Operazione fallita per carrello vuoto: {}", ex.getMessage());
+
+            ErrorResponse errorResponse = new ErrorResponse(
+                    "EMPTY_CART",
+                    ex.getMessage(),
+                    HttpStatus.BAD_REQUEST.value()
+            );
+
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+
+    @ExceptionHandler(EmptyOrderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleEmptyOrderException(EmptyOrderException ex) {
+
+        log.warn("Tentativo di creare un ordine vuoto: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                "EMPTY_ORDER",
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST.value()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(InviteNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ErrorResponse> handleInviteNotFoundException(InviteNotFoundException ex) {
+
+        log.warn("Tentativo di accedere a un invito non esistente: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                "INVITE_NOT_FOUND",
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND.value()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(EventNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ErrorResponse> handleEventNotFoundException(EventNotFoundException ex) {
+
+        log.warn("Tentativo di accedere a un evento non esistente: {}", ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                "EVENT_NOT_FOUND",
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND.value()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+}
 
 

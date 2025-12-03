@@ -1,7 +1,9 @@
 package com.filiera;
 
 import com.filiera.model.OsmMap.Indirizzo;
+import com.filiera.model.administration.Admin;
 import com.filiera.model.administration.Curatore;
+import com.filiera.model.events.AnimatoreFiliera;
 import com.filiera.model.payment.Carrello;
 import com.filiera.model.payment.ItemCarrello;
 import com.filiera.model.products.Pacchetto;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
@@ -26,6 +29,7 @@ import java.util.Set;
 
 
 @SpringBootApplication
+@EnableScheduling
 public class FilieraApplication implements CommandLineRunner {
     public static void main(String[] args) {
 
@@ -69,7 +73,7 @@ public class FilieraApplication implements CommandLineRunner {
         Venditore venditore1 = Produttore.builder()
                 .name("produttore1")
                 .address(indirizzo1)
-                .process("boh")
+                .approved(true)
                 .partitaIva("tuobabbo")
                 .email("venditore1@gmail.com")
                 .password(passwordEncoder.encode("password"))
@@ -79,7 +83,7 @@ public class FilieraApplication implements CommandLineRunner {
         Venditore venditore2 = Produttore.builder()
                 .name("produttore2")
                 .address(indirizzo2)
-                .process("boh2")
+                .approved(true)
                 .partitaIva("tuobabbo2")
                 .email("venditore2@gmail.com")
                 .password(passwordEncoder.encode("password"))
@@ -91,6 +95,7 @@ public class FilieraApplication implements CommandLineRunner {
                 .name("Distributore di tipicità")
                 .address(indirizzo1)
                 .role(RuoloUser.DISTRIBUTORE)
+                .approved(true)
                 .email("distributore@gmail.com")
                 .password(passwordEncoder.encode("password"))
                 .partitaIva("tuobabbo32312")
@@ -104,8 +109,7 @@ public class FilieraApplication implements CommandLineRunner {
                 .description("Pomodoro Ciliegino")
                 .price(1.99)
                 .availableQuantity(5)
-                .certification("DOP")
-                .expirationDate(LocalDate.of(2025, 10, 5)) // Se presente
+                .expirationDate(LocalDate.of(2025, 12, 5)) // Se presente
                 .seller(venditore1)
                 .build();
 
@@ -116,8 +120,7 @@ public class FilieraApplication implements CommandLineRunner {
                 .description("Cultivated")
                 .price(2.99)
                 .availableQuantity(3)
-                .certification("DOP")
-                .expirationDate(LocalDate.of(2025, 10, 5)) // Se presente
+                .expirationDate(LocalDate.of(2025, 12, 5)) // Se presente
                 .seller(venditore1)
                 .build();
 
@@ -130,8 +133,7 @@ public class FilieraApplication implements CommandLineRunner {
                 .description("Trasformated")
                 .price(4.99)
                 .availableQuantity(1)
-                .certification("DOP")
-                .expirationDate(LocalDate.of(2025, 10, 5)) // Se presente
+                .expirationDate(LocalDate.of(2025, 12, 5)) // Se presente
                 .seller(venditore2)
                 .build();
 
@@ -140,8 +142,7 @@ public class FilieraApplication implements CommandLineRunner {
                 .description("Trasformated")
                 .price(4.99)
                 .availableQuantity(2)
-                .certification("DOP")
-                .expirationDate(LocalDate.of(2025, 10, 5)) // Se presente
+                .expirationDate(LocalDate.of(2025, 12, 5)) // Se presente
                 .seller(venditore1)
                 .build();
 
@@ -152,8 +153,7 @@ public class FilieraApplication implements CommandLineRunner {
                 .description("Trasformated")
                 .price(10.99)
                 .availableQuantity(1)
-                .certification("DOP")
-                .expirationDate(LocalDate.of(2025, 10, 5)) // Se presente
+                .expirationDate(LocalDate.of(2025, 12, 5)) // Se presente
                 .seller(venditore2)
                 .build();
 
@@ -177,12 +177,13 @@ public class FilieraApplication implements CommandLineRunner {
                 .name("Curatore")
                 .role(RuoloUser.CURATORE)
                 .email("curatore@gmail.com")
+                .approved(true)
                 .password(passwordEncoder.encode("password"))
                 .build();
 
         Acquirente buyer1 = Acquirente.builder()
                 .name("Acquirente1")
-                .indirizzo(indirizzo1)
+                .approved(true)
                 .role(RuoloUser.ACQUIRENTE)
                 .email("acquirente1@gmail.com")
                 .password(passwordEncoder.encode("password"))
@@ -190,8 +191,8 @@ public class FilieraApplication implements CommandLineRunner {
 
         Acquirente buyer2 = Acquirente.builder()
                 .name("Acquirente2")
-                .indirizzo(indirizzo2)
                 .role(RuoloUser.ACQUIRENTE)
+                .approved(true)
                 .email("acquirente2@gmail.com")
                 .password(passwordEncoder.encode("password"))
                 .build();
@@ -213,17 +214,31 @@ public class FilieraApplication implements CommandLineRunner {
                 .price(20)
                 .availableQuantity(3)
                 .seller(distributoreTipicita)
-                .products(Set.of(cipolla,anguria,pomodoro))
                 .build();
+        pacchettoTipicità.addProduct(cipolla);
+        pacchettoTipicità.addProduct(anguria);
+        pacchettoTipicità.addProduct(pomodoro);
 
         pacchettoRepository.save(pacchettoTipicità);
 
-        ItemCarrello pacchetto = new ItemCarrello();
-        pacchetto.setPacchetto(pacchettoTipicità);
-        Carrello carrello = carrelloService.loadOrCreateCart(buyer2.getId());
-        pacchetto.setCart(carrello);
-        carrello.getProducts().add(pacchetto);
-        carrelloRepository.save(carrello);
+        AnimatoreFiliera animatoreFiliera = AnimatoreFiliera.builder()
+                .name("animatore")
+                .email("animatore@gmail.com")
+                .password(passwordEncoder.encode("password"))
+                .approved(true)
+                .role(RuoloUser.ANIMATORE)
+                .build();
+        userRepository.save(animatoreFiliera);
+
+        Admin admin = Admin.builder()
+                .name("Admin")
+                .email("admin@gmail.com")
+                .password(passwordEncoder.encode("password"))
+                .role(RuoloUser.ADMIN)
+                .approved(true)
+                .build();
+
+        userRepository.save(admin);
 
         System.out.println("Pacchettotipicità ID: " + pacchettoTipicità.getId());
         System.out.println("Venditore1 ID: "+ venditore1.getId());

@@ -17,15 +17,21 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authz -> authz
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html",
+                                "/swagger-ui/**"
+                        ).permitAll()
                         .requestMatchers("/public/**", "/auth/**").permitAll()
+                        .requestMatchers("/api/animatore/**").hasRole("ANIMATORE")
                         .requestMatchers("/acquirente/**").hasRole("ACQUIRENTE")
                         .requestMatchers("/curatore/**").hasRole("CURATORE")
                         .requestMatchers("/venditore/**").hasAnyRole("VENDITORE", "PRODUTTORE", "TRASFORMATORE", "DISTRIBUTORE")
                         .requestMatchers("/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()) // <<--- Basic Auth
-                .csrf(csrf -> csrf.disable()); // Disattivato per API REST
+                .httpBasic(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable());
 
         return http.build();
     }

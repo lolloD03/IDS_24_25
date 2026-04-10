@@ -16,6 +16,9 @@ public class PacchettoRequestDTO {
 
     private String description;
 
+    @Positive
+    private int availableQuantity;
+
     @Positive(message = "Il prezzo deve essere un numero positivo")
     private double price;
 

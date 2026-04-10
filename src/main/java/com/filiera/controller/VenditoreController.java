@@ -1,14 +1,10 @@
 package com.filiera.controller;
 
-import com.filiera.model.dto.PacchettoRequestDTO;
-import com.filiera.model.dto.PacchettoResponseDTO;
-import com.filiera.model.dto.ProdottoRequestDTO;
-import com.filiera.model.dto.ProductResponseDTO;
-import com.filiera.model.products.Prodotto;
-import com.filiera.model.sellers.Venditore;
+import com.filiera.model.dto.*;
 import com.filiera.services.CurrentUserService;
+import com.filiera.services.InvitoService;
 import com.filiera.services.PacchettoService;
-import com.filiera.services.ProductService;
+import com.filiera.services.ProductServiceImpl;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,24 +22,24 @@ import java.util.UUID;
 @Validated
 public class VenditoreController {
 
-    private final ProductService service;
+    private final ProductServiceImpl service;
     private final PacchettoService pacchettoService;
     private final CurrentUserService currentUserService;
+    private final InvitoService invitoService;
 
     @Autowired
-    public VenditoreController(ProductService service,  PacchettoService pacchettoService, CurrentUserService currentUserService) {
+    public VenditoreController(InvitoService invitoService,ProductServiceImpl service,  PacchettoService pacchettoService, CurrentUserService currentUserService) {
         this.service = service;
         this.pacchettoService = pacchettoService;
         this.currentUserService = currentUserService;
+        this.invitoService = invitoService;
     }
 
 
     @PostMapping("/create-bundle")
     public ResponseEntity<PacchettoResponseDTO> createPacchetto(@Valid @RequestBody PacchettoRequestDTO request) {
-        // Ottieni l'ID del venditore autenticato dal contesto di sicurezza
-
         UUID sellerId = currentUserService.getCurrentUserId();
-        // Chiama il service per la logica di business
+
         PacchettoResponseDTO createdPacchetto = pacchettoService.createPacchetto(request, sellerId);
 
         return new ResponseEntity<>(createdPacchetto, HttpStatus.CREATED);
@@ -51,7 +47,7 @@ public class VenditoreController {
 
     @PostMapping("/create-product")
     public ResponseEntity<ProductResponseDTO> createProduct(
-            @RequestBody @Valid ProdottoRequestDTO productDTO) { // Simulazione header di autenticazione
+            @RequestBody @Valid ProdottoRequestDTO productDTO) {
 
         UUID sellerId = currentUserService.getCurrentUserId();
 
@@ -59,38 +55,11 @@ public class VenditoreController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
-    // Alternativa: endpoint temporaneo per testing
-    @PostMapping("/create-product-test")
-    public ResponseEntity<ProductResponseDTO> createProductForTesting(
-            @RequestBody @Valid ProdottoRequestDTO productDTO,
-            @RequestParam UUID sellerId) { // Parametro temporaneo per test
 
-        ProductResponseDTO createdProduct = service.createProduct(productDTO, sellerId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
-    }
-
-
-    /*
-        @PostMapping("/create-product")
-        public ResponseEntity<Prodotto> createProduct(
-                @RequestParam @NotNull UUID venditor,
-                @RequestParam @NotBlank String name,
-                @RequestParam @NotBlank String descrizione,
-                @RequestParam @DecimalMin(value = "0.01", message = "Price must be greater than 0") double price,
-                @RequestParam @Min(value = 1, message = "Quantity must be greater than 0") int quantity,
-                @RequestParam @NotBlank String certification) {
-
-            Prodotto product = service.createProduct(venditor, name, descrizione, price, quantity, certification);
-            return ResponseEntity.status(HttpStatus.CREATED).body(product);
-        }
-
-
-     */
     @PutMapping("/update-product")
     public ResponseEntity<ProductResponseDTO> updateProduct(
             @PathVariable UUID productId,
-            @RequestBody @Valid ProdottoRequestDTO productDTO) { // Simulazione header di autenticazione
-
+            @RequestBody @Valid ProdottoUpdateDTO productDTO) {
 
         UUID sellerId = currentUserService.getCurrentUserId();
 
@@ -98,23 +67,17 @@ public class VenditoreController {
         return ResponseEntity.ok(product);
     }
 
-    @PutMapping("/update-product-testing")
-    public ResponseEntity<ProductResponseDTO> updateProductForTesting(
-            @PathVariable UUID productId,
-            @RequestBody @Valid ProdottoRequestDTO productDTO ,
-            @RequestParam UUID sellerId) { // Simulazione header di autenticazione
-
-
-
-        ProductResponseDTO product = service.updateProduct(productId, productDTO , sellerId);
-        return ResponseEntity.ok(product);
-    }
-
-    @DeleteMapping("/delete-product")
-
+    @DeleteMapping("/delete-product/{productId}")
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
         UUID sellerId = currentUserService.getCurrentUserId();
         service.deleteProduct(productId,sellerId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/delete-bundle/{bundleId}")
+    public ResponseEntity<Void> deleteBundle(@PathVariable UUID bundleId) {
+        UUID sellerId = currentUserService.getCurrentUserId();
+        pacchettoService.deletePacchetto(bundleId,sellerId);
         return ResponseEntity.noContent().build();
     }
 
@@ -135,5 +98,25 @@ public class VenditoreController {
     public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
         List<ProductResponseDTO> products = service.listAll();
         return ResponseEntity.ok(products);
+    }
+
+
+    @PatchMapping("/evento/{invitoId}")
+    public ResponseEntity<String> rispostaInvito(@PathVariable @NotNull UUID invitoId,
+                                                 @Valid @RequestBody InvitoResponse responseDTO) {
+        UUID sellerId = currentUserService.getCurrentUserId();
+
+        invitoService.respondToInvitation(invitoId, responseDTO.getStatoInvito(), sellerId);
+
+        return ResponseEntity.ok("Risposta all'invito registrata con successo.");
+    }
+
+    @GetMapping("/evento/visualizzaInviti")
+    public ResponseEntity<List<InvitoResponseDTO>> visualizzaInviti() {
+        UUID sellerId = currentUserService.getCurrentUserId();
+
+        List<InvitoResponseDTO> inviti = invitoService.getMyInvitations(sellerId);
+        return ResponseEntity.ok(inviti);
+
     }
 }

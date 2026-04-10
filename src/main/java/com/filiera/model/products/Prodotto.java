@@ -1,5 +1,6 @@
 package com.filiera.model.products;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.filiera.model.administration.Curatore;
 import com.filiera.model.sellers.Venditore;
 import jakarta.persistence.*;
@@ -10,13 +11,14 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 @Entity
-@Data // Genera getter, setter, equals, hashCode, toString
-@NoArgsConstructor // Costruttore senza argomenti per JPA
-// Abilita il pattern Builder per una creazione oggetti fluida
-@EqualsAndHashCode(of = "id") // Genera equals/hashCode solo basato sull'ID per le entità
-@ToString // Genera toString
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id")
+@ToString
 @SuperBuilder
 public class Prodotto {
 
@@ -24,8 +26,8 @@ public class Prodotto {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Enumerated(EnumType.STRING) // Mappa l'enum come stringa nel DB
-    private StatoProdotto state; // Enum StatoProdotto (APPROVATO, ESAURITO, IN_ATTESA_DI_APPROVAZIONE, RIFIUTATO)
+    @Enumerated(EnumType.STRING)
+    private StatoProdotto state;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
@@ -43,19 +45,30 @@ public class Prodotto {
     @Column(nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT") // Utile per testi più lunghi
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
-    @Min(value = 0, message = "Price cannot be negative") // Assicura che il prezzo non sia negativo
+    @Min(value = 0, message = "Price cannot be negative")
     private double price;
 
     @Column(nullable = false)
     @Min(value = 0, message = "Available quantity cannot be negative")
-    @Version
     private int availableQuantity;
 
-    private String certification; // Potrebbe essere nullable = true per default
+    @Column(nullable = false)
+    private int numeroCondivisioni = 0;
+
+
+    @ManyToMany
+    @JoinTable(
+            name = "prodotto_certificazione",
+            joinColumns = @JoinColumn(name = "prodotto_id"),
+            inverseJoinColumns = @JoinColumn(name = "certificazione_id")
+    )
+    @JsonManagedReference
+    @Builder.Default
+    private Set<Certificazione> certificazioni = new HashSet<>();
 
 
     @PrePersist
@@ -66,6 +79,23 @@ public class Prodotto {
 
     }
 
+    public boolean isApproved() {
+        return this.state == StatoProdotto.APPROVED;
+    }
+
+    public void addCertificazione(Certificazione cert) {
+        certificazioni.add(cert);
+        cert.getProdotti().add(this);
+    }
+
+    public void incrementaCondivisioni() {
+        this.numeroCondivisioni++;
+    }
+
+    public void removeCertificazione(Certificazione cert) {
+        certificazioni.remove(cert);
+        cert.getProdotti().remove(this);
+    }
 
 
     public void approveBy(Curatore curator) {
@@ -77,4 +107,6 @@ public class Prodotto {
         this.setState(StatoProdotto.REJECTED);
         this.setApprovedBy(curator);
     }
+
+
 }

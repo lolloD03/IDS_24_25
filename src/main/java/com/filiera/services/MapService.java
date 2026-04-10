@@ -47,7 +47,6 @@ public class MapService {
         Venditore vendor = (Venditore) venditoreRepo.findById(vendorId)
                 .orElseThrow(() -> new UserNotFoundException("Venditore non trovato con id: " + vendorId));
 
-        // Ricostruisci la stringa dell'indirizzo
         String formattedAddress = vendor.getAddress().getRoad() + " " +
                 vendor.getAddress().getCivicNumber() + ", " +
                 vendor.getAddress().getCity();

@@ -15,12 +15,11 @@ import java.util.UUID;
 public class ProductResponseDTO {
     private UUID id;
     private String name;
-    private String description; // Use consistent naming: 'description'
+    private String description;
     private double price;
     private int availableQuantity;
     private String certification;
     private LocalDate expirationDate;
-    private String state; // Represents StatoProdotto as a String (e.g., "APPROVED")
-    private SellerResponseDTO seller; // Nested DTO for seller information
-    // Add other fields you want to expose, but keep it concise
+    private String state;
+    private SellerResponseDTO seller;
 }

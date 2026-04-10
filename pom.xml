@@ -10,7 +10,7 @@
         <version>3.3.1</version> <relativePath/> </parent>
 
     <groupId>com.filiera</groupId>
-    <artifactId>ProgettoProvaIDS</artifactId>
+    <artifactId>AgriculturalMarketplace</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

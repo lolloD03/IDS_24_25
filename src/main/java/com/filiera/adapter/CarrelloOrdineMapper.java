@@ -20,13 +20,27 @@ public class CarrelloOrdineMapper {
         }
 
         List<ItemCarrelloResponseDTO> itemDTOs = cart.getProducts().stream()
-                .map(item -> ItemCarrelloResponseDTO.builder()
-                        .productId(item.getProduct().getId())
-                        .productName(item.getProduct().getName())
-                        .unitPrice(item.getProduct().getPrice())
-                        .quantity(item.getQuantity())
-                        .subtotal(item.getProduct().getPrice() * item.getQuantity())
-                        .build())
+                .map(item -> {
+                    if (item.getProduct() != null) {
+                        return ItemCarrelloResponseDTO.builder()
+                                .productId(item.getProduct().getId())
+                                .productName(item.getProduct().getName())
+                                .unitPrice(item.getProduct().getPrice())
+                                .quantity(item.getQuantity())
+                                .subtotal(item.getProduct().getPrice() * item.getQuantity())
+                                .build();
+                    } else if (item.getPacchetto() != null) {
+                        return ItemCarrelloResponseDTO.builder()
+                                .productId(item.getPacchetto().getId())
+                                .productName(item.getPacchetto().getName())
+                                .unitPrice(item.getPacchetto().getPrice())
+                                .quantity(item.getQuantity())
+                                .subtotal(item.getPacchetto().getPrice() * item.getQuantity())
+                                .build();
+                    } else {
+                        throw new IllegalStateException("Item nel carrello non valido");
+                    }
+                })
                 .collect(Collectors.toList());
 
         return CarrelloResponseDTO.builder()

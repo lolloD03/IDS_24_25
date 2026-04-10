@@ -1,9 +1,6 @@
 package com.filiera.services;
 
-import com.filiera.exception.CuratorNotFoundException;
-import com.filiera.exception.InvalidUserTypeException;
-import com.filiera.exception.ProductNotFoundException;
-import com.filiera.exception.ProductNotPendingException;
+import com.filiera.exception.*;
 import com.filiera.model.administration.Curatore;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
@@ -43,17 +40,13 @@ public class CuratoreServiceImpl {
     public Prodotto approveProduct(UUID productId, UUID curatorId) {
         log.info("Approving product {} by curator {}", productId, curatorId);
 
-        // Validate input parameters
         validateIds(productId, curatorId);
 
-        // Find and validate product
         Prodotto product = findProductById(productId);
         validateProductForApproval(product);
 
-        // Find and validate curator
         Curatore curator = findCuratorById(curatorId);
 
-        // Approve product
         product.approveBy(curator);
         Prodotto approvedProduct = productRepository.save(product);
 
@@ -124,7 +117,7 @@ public class CuratoreServiceImpl {
 
     private Curatore findCuratorById(UUID curatorId) {
         User user = userRepository.findById(curatorId)
-                .orElseThrow(() -> new CuratorNotFoundException("Curator with ID " + curatorId + " doesn't exist."));
+                .orElseThrow(() -> new UserNotFoundException("Curator with ID " + curatorId + " doesn't exist."));
 
         if (!(user instanceof Curatore)) {
             throw new InvalidUserTypeException("User with ID " + curatorId + " is not a curator.");

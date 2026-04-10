@@ -19,7 +19,6 @@ public class CurrentUserInterceptor implements HandlerInterceptor {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
         if (auth != null && auth.getPrincipal() instanceof UserDetails userDetails) {
-            // Salviamo l’utente loggato nella request
             request.setAttribute("currentUser", userDetails);
         }
 

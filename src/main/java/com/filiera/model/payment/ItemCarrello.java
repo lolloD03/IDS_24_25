@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.cache.spi.support.AbstractReadWriteAccess;
 
 import java.util.UUID;
 
@@ -15,18 +16,16 @@ import java.util.UUID;
 @Entity
 public class ItemCarrello {
 
-    // Relazione con Prodotto. Sarà null se l'item è un Pacchetto.
     @ManyToOne
     @JoinColumn(name = "prodotto_id")
     private Prodotto product;
 
-    // Relazione con Pacchetto. Sarà null se l'item è un Prodotto.
     @ManyToOne
     @JoinColumn(name = "pacchetto_id")
     private Pacchetto pacchetto;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "carrello_id", nullable = false) // Assicura che l'ItemCarrello sia sempre legato a un Carrello
+    @JoinColumn(name = "carrello_id", nullable = false)
     private Carrello cart;
 
     @Id
@@ -40,6 +39,11 @@ public class ItemCarrello {
         this.quantity = quantity;
     }
 
+    public ItemCarrello(Pacchetto pacchetto, int quantity) {
+        this.pacchetto = pacchetto;
+        this.quantity = quantity;
+    }
+
     public void increaseQuantity(int q) {
         this.quantity += q;
     }
@@ -49,7 +53,16 @@ public class ItemCarrello {
     }
 
     public double getTotal() {
-        return product.getPrice() * quantity;
+        double totalPrice = 0;
+
+        if (product != null) {
+            totalPrice += product.getPrice() * quantity;
+        } else if (pacchetto != null) {
+            totalPrice += pacchetto.getPrice() * quantity;
+        } else {
+            throw new IllegalStateException("Né prodotto né pacchetto trovato.");
+        }
+return totalPrice;
     }
 
 }

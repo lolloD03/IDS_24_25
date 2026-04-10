@@ -5,7 +5,7 @@ import com.filiera.model.products.Prodotto;
 import com.filiera.model.products.StatoProdotto;
 import com.filiera.services.CuratoreServiceImpl;
 import com.filiera.services.CurrentUserService;
-import com.filiera.services.ProductService;
+import com.filiera.services.ProductServiceImpl;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,10 +22,10 @@ public class CuratoreController {
 
     private final CuratoreServiceImpl curatoreService;
     private final CurrentUserService currentUserService;
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
 
     @Autowired
-    public CuratoreController(CuratoreServiceImpl curatoreService,  CurrentUserService currentUserService,ProductService productService) {
+    public CuratoreController(CuratoreServiceImpl curatoreService,  CurrentUserService currentUserService,ProductServiceImpl productService) {
         this.curatoreService = curatoreService;
         this.currentUserService = currentUserService;
         this.productService =  productService;
@@ -45,7 +45,7 @@ public class CuratoreController {
         Prodotto approvedProduct = curatoreService.approveProduct(productId, curatorId);
         return ResponseEntity.ok(approvedProduct);
     }
-    // PRENDERE ID DAL CONTESTO DELLA SICUREZZA
+
     @PutMapping("/reject-product")
     public ResponseEntity<Prodotto> rejectProduct(
             @RequestParam @NotNull UUID productId
@@ -71,5 +71,4 @@ public class CuratoreController {
         return ResponseEntity.ok(products);
     }
 
-    //rimossi getApprovedProduct ecc perche sostituiti da getProductsByState
 }

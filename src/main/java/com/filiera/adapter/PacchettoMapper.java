@@ -11,12 +11,6 @@ import java.util.stream.Collectors;
 @Component
 public class PacchettoMapper {
 
-    /**
-     * Converts a Pacchetto entity to a PacchettoResponseDTO.
-     *
-     * @param pacchetto The Pacchetto entity.
-     * @return The corresponding PacchettoResponseDTO.
-     */
     public PacchettoResponseDTO toDTO(Pacchetto pacchetto) {
         if (pacchetto == null) {
             return null;
@@ -27,14 +21,19 @@ public class PacchettoMapper {
                 .name(pacchetto.getName())
                 .description(pacchetto.getDescription())
                 .price(pacchetto.getPrice())
+                .quantity(pacchetto.getAvailableQuantity())
                 .sellerId(pacchetto.getSeller() != null ? pacchetto.getSeller().getId() : null)
-                .products(pacchetto.getProducts().stream()
-                        .map(this::toProductResponseDTO)
+                .products(pacchetto.getProductSnapshots().stream()
+                        .map(snapshot -> ProductResponseDTO.builder()
+                                .name(snapshot.getName())
+                                .description(snapshot.getDescription())
+                                .price(snapshot.getPrice())
+                                .build())
                         .collect(Collectors.toList()))
                 .build();
     }
 
-    // Metodo helper privato per mappare l'entità Prodotto nel suo DTO
+
     private ProductResponseDTO toProductResponseDTO(Prodotto prodotto) {
         if (prodotto == null) {
             return null;
@@ -44,7 +43,6 @@ public class PacchettoMapper {
                 .id(prodotto.getId())
                 .name(prodotto.getName())
                 .price(prodotto.getPrice())
-                // Aggiungi altri campi del prodotto se necessario
                 .build();
     }
 }

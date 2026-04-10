@@ -1,16 +1,17 @@
 package com.filiera.services;
 
-import com.filiera.exception.InsufficientQuantityException;
-import com.filiera.exception.ProductNotFoundException;
-import com.filiera.exception.SellerNotFoundException;
+import com.filiera.exception.*;
 
 import com.filiera.adapter.PacchettoMapper;
 import com.filiera.model.dto.PacchettoRequestDTO;
 import com.filiera.model.dto.PacchettoResponseDTO;
+import com.filiera.model.payment.Carrello;
+import com.filiera.model.payment.ItemCarrello;
 import com.filiera.model.products.Pacchetto;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.sellers.DistributoreTipicita;
 import com.filiera.model.sellers.Venditore;
+import com.filiera.repository.InMemoryCarrelloRepository;
 import com.filiera.repository.InMemoryPacchettoRepository;
 import com.filiera.repository.InMemoryProductRepository;
 import com.filiera.repository.InMemoryUserRepository;
@@ -18,12 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class PacchettoService {
+public class PacchettoService implements PacchettoQueryService{
 
+    private final InMemoryCarrelloRepository carrelloRepository;
     private final InMemoryPacchettoRepository pacchettoRepo;
     private final InMemoryProductRepository prodottoRepo;
     private final InMemoryUserRepository venditoreRepo;
@@ -31,41 +35,47 @@ public class PacchettoService {
     private final ProductServiceImpl productService;
 
 
-    public PacchettoService(InMemoryPacchettoRepository pacchettoRepo, InMemoryProductRepository prodottoRepo, InMemoryUserRepository venditoreRepo, PacchettoMapper pacchettoMapper, ProductServiceImpl prodService) {
+    public PacchettoService(InMemoryCarrelloRepository carrelloRepository,InMemoryPacchettoRepository pacchettoRepo, InMemoryProductRepository prodottoRepo, InMemoryUserRepository venditoreRepo, PacchettoMapper pacchettoMapper, ProductServiceImpl prodService) {
         this.pacchettoRepo = pacchettoRepo;
         this.prodottoRepo = prodottoRepo;
         this.venditoreRepo = venditoreRepo;
         this.pacchettoMapper = pacchettoMapper;
         this.productService = prodService;
+        this.carrelloRepository = carrelloRepository;
 
+    }
+
+    public Optional<Pacchetto> getPacchettoById(UUID id) {
+        return pacchettoRepo.findById(id);
+    }
+
+    @Override
+    public List<PacchettoResponseDTO> getAllPacchetti() {
+        return pacchettoRepo.findAll().stream().map(pacchettoMapper::toDTO).collect(Collectors.toList());
     }
 
     @Transactional
     public PacchettoResponseDTO createPacchetto(PacchettoRequestDTO request, UUID sellerId) {
-        // 1. Trova il venditore che sta creando il pacchetto (dal contesto di sicurezza)
-        Venditore seller = (DistributoreTipicita) venditoreRepo.findById(sellerId)
-                .orElseThrow(() -> new SellerNotFoundException("Venditore non trovato con id: " + sellerId));
+        DistributoreTipicita seller = (DistributoreTipicita) venditoreRepo.findById(sellerId)
+                .orElseThrow(() -> new UserNotFoundException("Venditore non trovato con id: " + sellerId));
 
-        // 2. Crea l'entità Pacchetto
         Pacchetto pacchetto = Pacchetto.builder()
                 .name(request.getName())
                 .description(request.getDescription())
+                .availableQuantity(request.getAvailableQuantity())
                 .price(request.getPrice())
                 .seller(seller)
                 .build();
 
-        // 3. Trova i prodotti per ID e aggiungili al pacchetto
         request.getProductIds().forEach(productId -> {
             Prodotto prodotto = prodottoRepo.findById(productId)
                     .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con id: " + productId));
             productService.checkProductState(productId);
-            pacchetto.getProducts().add(prodotto); // OPZIONALE , CREARE UN METODO SU PACCHETTO INVECE CHE UTILIZZARE IL METODO DA QUA
+            pacchetto.addProduct(prodotto); // OPZIONALE , CREARE UN METODO SU PACCHETTO INVECE CHE UTILIZZARE IL METODO DA QUA
         });
 
-        // 4. Salva il pacchetto
         Pacchetto savedPacchetto = pacchettoRepo.save(pacchetto);
 
-        // 5. Usa il mapper per convertire l'entità in DTO per la risposta
         return pacchettoMapper.toDTO(savedPacchetto);
     }
 
@@ -80,5 +90,27 @@ public class PacchettoService {
 
         pacchetto.setAvailableQuantity(pacchetto.getAvailableQuantity() - quantityToDeduct);
         pacchettoRepo.save(pacchetto);
+    }
+
+    public void deletePacchetto(UUID pacchettoId, UUID sellerId) {
+
+        DistributoreTipicita seller = (DistributoreTipicita) venditoreRepo.findById(sellerId)
+                .orElseThrow(() -> new UserNotFoundException("Seller not found with Id: " + sellerId));
+
+        Pacchetto pacchetto = pacchettoRepo.findById(pacchettoId)
+                .orElseThrow(()->new ProductNotFoundException("Pacchetto not found with id: " + pacchettoId));
+
+        if (!pacchetto.getSeller().getId().equals(sellerId)) {
+            throw new InvalidUserTypeException("Seller with ID " + sellerId +
+                    " is not authorized to update product with ID " + pacchettoId);
+        }
+
+        List<Carrello> carrelli = carrelloRepository.findAll();
+        for (Carrello carrello : carrelli) {
+            carrello.getProducts().removeIf(item -> pacchettoId.equals(
+                    item.getPacchetto() != null ? item.getPacchetto().getId() : null));
+        }
+        seller.removePacchetto(pacchetto);
+        pacchettoRepo.delete(pacchetto);
     }
 }

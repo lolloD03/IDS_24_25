@@ -9,9 +9,9 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@DiscriminatorValue("CURATORE") // Valore specifico per il discriminatore
-@NoArgsConstructor // Genera il costruttore senza argomenti, necessario per JPA
-@SuperBuilder // Essenziale per estendere il builder dalla classe padre User
+@DiscriminatorValue("CURATORE")
+@NoArgsConstructor
+@SuperBuilder
 @ToString(callSuper = true)
 public class Curatore extends User {
 

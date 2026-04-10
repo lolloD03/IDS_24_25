@@ -21,6 +21,4 @@ public class EventoRequestDTO {
     @NotBlank
     private String location;
 
-
-    private List<UUID> invitedUserIds;
 }

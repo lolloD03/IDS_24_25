@@ -1,11 +1,10 @@
 package com.filiera.controller;
 
 import com.filiera.model.dto.CarrelloResponseDTO;
+import com.filiera.model.dto.EventoSimpleDTO;
 import com.filiera.model.dto.OrdineResponseDTO;
 import com.filiera.model.dto.ProductResponseDTO;
-import com.filiera.services.CarrelloServiceImpl;
-import com.filiera.services.CurrentUserService;
-import com.filiera.services.ProductService;
+import com.filiera.services.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +23,17 @@ public class AcquirenteController {
 
     private final CurrentUserService currentUserService;
     private final CarrelloServiceImpl service;
-    private final ProductService productService;
+    private final ProductServiceImpl productService;
+    private final PrenotazioneService prenotazioneService;
+    private final EventQueryService eventQueryService;
 
     @Autowired
-    public AcquirenteController(CarrelloServiceImpl service , CurrentUserService currentUserService, ProductService productService ) {this.service = service;
-        this.currentUserService = currentUserService; this.productService = productService;}
+    public AcquirenteController(EventQueryService eventQueryService,CarrelloServiceImpl service , CurrentUserService currentUserService, ProductServiceImpl productService , PrenotazioneService prenotazioneService) {this.service = service;
+        this.currentUserService = currentUserService;
+        this.productService = productService;
+        this.prenotazioneService = prenotazioneService;
+        this.eventQueryService = eventQueryService;
+    }
 
 
 
@@ -40,8 +45,7 @@ public class AcquirenteController {
         UUID buyerId = currentUserService.getCurrentUserId();
         log.info("Adding product {} with quantity {} to cart for buyer {}", product, quantity, buyerId);
 
-        CarrelloResponseDTO cart = service.addProduct(product, quantity , buyerId);
-
+        CarrelloResponseDTO cart = service.addToCart(product,quantity,buyerId);
         log.info("Product successfully added to cart for buyer {}", buyerId);
         return ResponseEntity.ok(cart);
     }
@@ -55,7 +59,7 @@ public class AcquirenteController {
         log.info("Removing product {} with quantity {} from cart for buyer {}", product, quantity, buyerId);
 
 
-        CarrelloResponseDTO cart = service.removeProduct(product, quantity , buyerId); // Il service restituisce già il DTO
+        CarrelloResponseDTO cart = service.removeItemFromCart(product,quantity, buyerId);
 
         log.info("Product successfully removed from cart for buyer {}", buyerId);
         return ResponseEntity.ok(cart);
@@ -76,7 +80,7 @@ public class AcquirenteController {
         service.clearCart(buyerId);
 
         log.info("Cart successfully cleared for buyer {}", buyerId);
-        return ResponseEntity.noContent().build(); // 204 No Content è più appropriato
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/carrello")
@@ -84,7 +88,7 @@ public class AcquirenteController {
         UUID buyerId = currentUserService.getCurrentUserId();
         log.debug("Retrieving cart for buyer {}", buyerId);
 
-        CarrelloResponseDTO cartResponse = service.getCart(buyerId); // Il service restituisce già il DTO
+        CarrelloResponseDTO cartResponse = service.getCart(buyerId);
 
         return ResponseEntity.ok(cartResponse);
     }
@@ -100,6 +104,31 @@ public class AcquirenteController {
 
     }
 
+
+
+    @PostMapping("/prenota/{eventId}")
+    public ResponseEntity<String> prenotaEvento(
+            @PathVariable UUID eventId
+    ) {
+        UUID buyerId = currentUserService.getCurrentUserId();
+
+        prenotazioneService.prenotaEvento(eventId, buyerId);
+        return ResponseEntity.ok("Prenotazione avvenuta con successo!");
+    }
+
+    @DeleteMapping("/rimuovi/{eventId}")
+    public ResponseEntity<String> rimuoviPrenotazione(@PathVariable UUID eventId) {
+        UUID acquirenteId = currentUserService.getCurrentUserId();
+        prenotazioneService.rimuoviPrenotazioneEvento(eventId, acquirenteId);
+        return ResponseEntity.ok("Prenotazione annullata con successo!");
+    }
+
+    @GetMapping("/eventiPrenotati")
+    public ResponseEntity<List<EventoSimpleDTO>> getEventiPrenotati() {
+        UUID buyerId = currentUserService.getCurrentUserId();
+
+        return ResponseEntity.ok(eventQueryService.getEventsRegisteredByUser(buyerId));
+    }
 
 
 }

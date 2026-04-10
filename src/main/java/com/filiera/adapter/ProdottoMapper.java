@@ -1,16 +1,16 @@
 package com.filiera.adapter;
 
-import com.filiera.model.dto.ProdottoRequestDTO;
-import com.filiera.model.dto.ProductResponseDTO;
-import com.filiera.model.dto.SellerResponseDTO;
+import com.filiera.model.dto.*;
+import com.filiera.model.products.Certificazione;
 import com.filiera.model.products.Prodotto;
 import com.filiera.model.sellers.Venditore;
+import com.filiera.repository.InMemoryCertificazioneRepository;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProdottoMapper {
 
-    // Mapper from Entity to Response DTO (as we did before)
+
     public ProductResponseDTO toDTO(Prodotto prodotto) {
         if (prodotto == null) {
             return null;
@@ -30,27 +30,59 @@ public class ProdottoMapper {
                 .description(prodotto.getDescription())
                 .price(prodotto.getPrice())
                 .availableQuantity(prodotto.getAvailableQuantity())
-                .certification(prodotto.getCertification())
+                .certification(prodotto.getCertificazioni().toString())
                 .expirationDate(prodotto.getExpirationDate())
                 .state(prodotto.getState().name())
                 .seller(sellerDTO)
                 .build();
     }
 
-    // New mapper from Request DTO to Entity
+
+
     public Prodotto toEntity(ProdottoRequestDTO prodottoRequestDTO, Venditore seller) {
         if (prodottoRequestDTO == null) {
             return null;
         }
 
-        return Prodotto.builder()
+        Prodotto prodotto = Prodotto.builder()
                 .name(prodottoRequestDTO.getName())
                 .description(prodottoRequestDTO.getDescription())
                 .price(prodottoRequestDTO.getPrice())
                 .availableQuantity(prodottoRequestDTO.getQuantity())
-                .certification(prodottoRequestDTO.getCertification())
                 .expirationDate(prodottoRequestDTO.getExpirationDate())
-                .seller(seller) // The seller entity is passed as a separate argument
+                .seller(seller)
                 .build();
+
+        return prodotto;
     }
+
+    public void updateEntity(Prodotto prodotto, ProdottoUpdateDTO dto) {
+        if (dto == null || prodotto == null) {
+            return;
+        }
+
+
+
+        if (dto.getName() != null) {
+            prodotto.setName(dto.getName());
+        }
+
+        if (dto.getDescription() != null) {
+            prodotto.setDescription(dto.getDescription());
+        }
+
+        if (dto.getPrice() >= 0) {
+            prodotto.setPrice(dto.getPrice());
+        }
+
+        if (dto.getQuantity() >= 0) {
+            prodotto.setAvailableQuantity(dto.getQuantity());
+        }
+
+        if (dto.getExpirationDate() != null) {
+            prodotto.setExpirationDate(dto.getExpirationDate());
+        }
+
+    }
+
 }

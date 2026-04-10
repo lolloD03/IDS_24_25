@@ -1,8 +1,9 @@
 package com.filiera.model.events;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.filiera.Observer.Observer;
 import com.filiera.Observer.Subject;
-import com.filiera.model.users.User;
+import com.filiera.model.users.Acquirente;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,19 +33,25 @@ public class Evento implements Subject {
 
     @ManyToOne
     @JoinColumn(name = "organizer_id")
+    @JsonManagedReference
     private AnimatoreFiliera organizer;
 
-    // Relazione molti-a-molti con tutti gli utenti invitati
+
     @ManyToMany
     @JoinTable(
-            name = "evento_invitati",
+            name = "evento_partecipanti",
             joinColumns = @JoinColumn(name = "evento_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
+            inverseJoinColumns = @JoinColumn(name = "acquirente_id")
     )
     @Builder.Default
-    private Set<User> invitedUsers = new HashSet<>();
+    private Set<Acquirente> registeredBuyers = new HashSet<>();
 
-    @Transient // This field is not persisted in the database
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true) // Eager può essere utile qui
+    @Builder.Default
+    private Set<Invito> inviti = new HashSet<>();
+
+    @Transient
+    @Builder.Default
     private List<Observer> observers = new ArrayList<>();
 
     @Override
@@ -64,4 +71,24 @@ public class Evento implements Subject {
             observer.update(message);
         }
     }
+
+    public void addInvito(Invito invito) {
+        inviti.add(invito);
+    }
+
+    public void registerBuyer(Acquirente acquirente) {
+        if (registeredBuyers.contains(acquirente)) {
+            throw new IllegalStateException("L'acquirente ha già prenotato questo evento.");
+        }
+        registeredBuyers.add(acquirente);
+    }
+
+    public void removeBuyer(Acquirente acquirente) {
+        if (!registeredBuyers.contains(acquirente)) {
+            throw new IllegalStateException("L'acquirente ha già prenotato questo evento.");
+        }
+        registeredBuyers.remove(acquirente);
+    }
+
+
 }

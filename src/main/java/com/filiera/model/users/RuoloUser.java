@@ -7,7 +7,8 @@ public enum RuoloUser {
     CURATORE,
     ACQUIRENTE,
     ANIMATORE,
-    DISTRIBUTORE
+    DISTRIBUTORE,
+    ADMIN
 
 
 }
